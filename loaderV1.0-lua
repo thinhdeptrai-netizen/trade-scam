@@ -1,82 +1,243 @@
-local Players = game:GetService("Players")
-local TeleportService = game:GetService("TeleportService")
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
 
--- 📦 GUI chính
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "CustomToggleUI"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
+local Window = Rayfield:CreateWindow({
+   Name = "steal 3.0 / made by RAUSENIA",
+   LoadingTitle = "steal 3.0 loading...",
+   LoadingSubtitle = "by RAUSENIA",
+   ConfigurationSaving = { Enabled = false },
+   Discord = { Enabled = false },
+   KeySystem = false
+})
+local Main = Window:CreateTab("Main", 4483362458)
 
--- 🔲 Nút nhỏ để bật/tắt menu
-local toggleButton = Instance.new("TextButton")
-toggleButton.Size = UDim2.new(0, 50, 0, 50)
-toggleButton.Position = UDim2.new(0, 20, 0, 20)
-toggleButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-toggleButton.Text = "Th1nH Z"
-toggleButton.Font = Enum.Font.SourceSansBold
-toggleButton.TextSize = 24
-toggleButton.TextColor3 = Color3.new(1, 1, 1)
-toggleButton.Parent = screenGui
+Main:CreateToggle({
+   Name = "Steal fast : Off",
+   CurrentValue = false,
+   Callback = function(Value)
+      Rayfield:Notify({
+         Title = "Success",
+         Content = "success✅️",
+         Duration = 3
+      })
+   end
+})
 
--- 📋 Menu lớn
-local mainMenu = Instance.new("Frame")
-mainMenu.Size = UDim2.new(0, 300, 0, 250)
-mainMenu.Position = UDim2.new(0.5, -150, 0.5, -125)
-mainMenu.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-mainMenu.Active = true
-mainMenu.Draggable = true -- ✅ có thể kéo
-mainMenu.Visible = false
-mainMenu.Parent = screenGui
+Main:CreateButton({
+   Name = "Steal best in sever",
+   Callback = function()
+      Rayfield:Notify({
+         Title = "Oops!",
+         Content = "no one has a pet❎️",
+         Duration = 3
+      })
+   end
+})
 
--- Layout cho các nút
-local layout = Instance.new("UIListLayout", mainMenu)
-layout.Padding = UDim.new(0, 15)
-layout.FillDirection = Enum.FillDirection.Vertical
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-layout.VerticalAlignment = Enum.VerticalAlignment.Center
+Main:CreateButton({
+   Name = "Leave",
+   Callback = function()
+      game:Shutdown()
+   end
+})
+local Steal = Window:CreateTab("Steal", 4483362458)
 
--- 🔘 Hàm tạo nút
-local function createButton(text, callback)
-	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(0, 220, 0, 50)
-	button.Text = text
-	button.Font = Enum.Font.SourceSansBold
-	button.TextSize = 20
-	button.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-	button.TextColor3 = Color3.new(1, 1, 1)
-	button.Parent = mainMenu
-	button.MouseButton1Click:Connect(callback)
-	return button
-end
+Steal:CreateButton({
+   Name = "Menu steal 2.0",
+   Callback = function()
+      local sg = Instance.new("ScreenGui", game.CoreGui)
+      local f = Instance.new("Frame", sg)
+      f.Size = UDim2.new(0, 300, 0, 200)
+      f.Position = UDim2.new(0.5, -150, 0.5, -100)
+      f.BackgroundColor3 = Color3.new(0.1, 0.1, 0.1)
+      f.Active = true
+      f.Draggable = true
 
--- NÚT 1: SPAWN PET VISUAL
-local spawnButton
-spawnButton = createButton("SPAWN PET VISUAL", function()
-	spawnButton.Text = "THÀNH CÔNG"
-	wait(1)
-	TeleportService:Teleport(game.PlaceId) -- Rejoin lại game
+      local input = Instance.new("TextBox", f)
+      input.Size = UDim2.new(1, -20, 0, 30)
+      input.Position = UDim2.new(0, 10, 0, 10)
+      input.PlaceholderText = "Search player..."
+
+      local btn = Instance.new("TextButton", f)
+      btn.Size = UDim2.new(1, -20, 0, 40)
+      btn.Position = UDim2.new(0, 10, 1, -50)
+      btn.Text = "Steal"
+      btn.BackgroundColor3 = Color3.fromRGB(50, 150, 50)
+
+      btn.MouseButton1Click:Connect(function()
+         local bar = Instance.new("TextLabel", sg)
+         bar.Size = UDim2.new(0.3, 0, 0.05, 0)
+         bar.Position = UDim2.new(0.35, 0, 0.45, 0)
+         bar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+         bar.TextColor3 = Color3.new(1,1,1)
+         bar.TextScaled = true
+         bar.Text = "Stealing... 0%"
+         for i = 1, 100 do
+            bar.Text = "Stealing... "..i.."%"
+            wait(0.15)
+         end
+         game:GetService("TeleportService"):Teleport(game.PlaceId)
+      end)
+   end
+})
+
+Steal:CreateButton({
+   Name = "Menu steal 1.0 (Has been patched)",
+   Callback = function()
+      Rayfield:Notify({
+         Title = "Patched",
+         Content = "PATCHED NOT WORKING❎️",
+         Duration = 3
+      })
+   end
+})
+
+Steal:CreateParagraph({
+   Title = "Wait for next update...",
+   Content = ""
+})
+local Teleport = Window:CreateTab("Teleport", 4483362458)
+
+Teleport:CreateButton({
+   Name = "Hop sever",
+   Callback = function()
+      game:GetService("TeleportService"):Teleport(game.PlaceId)
+   end
+})
+
+Teleport:CreateButton({
+   Name = "Finder pet (dragonfly, raccoon, kitsune, ...)",
+   Callback = function()
+      Rayfield:Notify({
+         Title = "Scanning...",
+         Content = "Searching for rare pets...",
+         Duration = 3
+      })
+      wait(5)
+      while true do
+         wait(2)
+         game:GetService("TeleportService"):Teleport(game.PlaceId)
+      end
+   end
+})
+
+Teleport:CreateParagraph({
+   Title = "Wait for next update...",
+   Content = ""
+})
+local Visual = Window:CreateTab("Visual", 4483362458)
+
+Visual:CreateToggle({
+   Name = "ESP Pet",
+   CurrentValue = false,
+   Callback = function(Value)
+      -- Cần thêm logic theo game cụ thể
+   end
+})
+
+Visual:CreateToggle({
+   Name = "ESP Player",
+   CurrentValue = false,
+   Callback = function(Value)
+      -- Cần thêm logic theo game cụ thể
+   end
+})
+-- Auto Steal UI nhỏ (di chuyển được)
+local sg = Instance.new("ScreenGui", game.CoreGui)
+sg.Name = "AutoStealMini"
+
+local small = Instance.new("TextButton", sg)
+small.Size = UDim2.new(0, 100, 0, 100)
+small.Position = UDim2.new(0, 10, 0.6, 0)
+small.Text = "Sl3ep\nAuto Steal"
+small.TextScaled = true
+small.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+small.TextColor3 = Color3.fromRGB(255, 255, 255)
+small.Active = true
+small.Draggable = true
+
+-- Menu lớn bên trong
+local big = Instance.new("Frame", sg)
+big.Size = UDim2.new(0, 400, 0, 300)
+big.Position = UDim2.new(0.5, -200, 0.5, -150)
+big.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+big.Visible = false
+big.Active = true
+big.Draggable = true
+
+-- Made by Sleepinthebed góc trên trái
+local madeBy = Instance.new("TextLabel", big)
+madeBy.Size = UDim2.new(0, 200, 0, 25)
+madeBy.Position = UDim2.new(0, 10, 0, 5)
+madeBy.Text = "made by Sleepinthebed"
+madeBy.BackgroundTransparency = 1
+madeBy.TextColor3 = Color3.fromRGB(255, 255, 255)
+madeBy.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Nút Steal Fruit
+local fruitBtn = Instance.new("TextButton", big)
+fruitBtn.Size = UDim2.new(0.9, 0, 0, 50)
+fruitBtn.Position = UDim2.new(0.05, 0, 0.25, 0)
+fruitBtn.Text = "Steal Fruit"
+fruitBtn.BackgroundColor3 = Color3.fromRGB(0, 150, 0)
+fruitBtn.TextColor3 = Color3.new(1,1,1)
+fruitBtn.TextScaled = true
+
+fruitBtn.MouseButton1Click:Connect(function()
+   local bar = Instance.new("TextLabel", sg)
+   bar.Size = UDim2.new(0.5, 0, 0.05, 0)
+   bar.Position = UDim2.new(0.25, 0, 0.45, 0)
+   bar.BackgroundColor3 = Color3.fromRGB(0, 200, 0)
+   bar.TextColor3 = Color3.new(1,1,1)
+   bar.TextScaled = true
+   bar.Text = "Stealing Fruit... 0%"
+   for i = 1, 100 do
+      bar.Text = "Stealing Fruit... "..i.."%"
+      wait(0.6)
+   end
+   Rayfield:Notify({
+      Title = "SUCCESS✅️",
+      Content = "Steal Fruit done!",
+      Duration = 3
+   })
+   game:GetService("TeleportService"):Teleport(game.PlaceId)
 end)
 
--- NÚT 2: TRADE SCAM: OFF (chuyển đổi ON/OFF)
-local tradeState = false
-local tradeButton
-tradeButton = createButton("TRADE SCAM: OFF", function()
-	tradeState = not tradeState
-	if tradeState then
-		tradeButton.Text = "TRADE SCAM: ON"
-	else
-		tradeButton.Text = "TRADE SCAM: OFF"
-	end
+-- Nút Steal Pet
+local petBtn = fruitBtn:Clone()
+petBtn.Parent = big
+petBtn.Position = UDim2.new(0.05, 0, 0.45, 0)
+petBtn.Text = "Steal Pet"
+petBtn.MouseButton1Click:Connect(function()
+   local bar = Instance.new("TextLabel", sg)
+   bar.Size = UDim2.new(0.5, 0, 0.05, 0)
+   bar.Position = UDim2.new(0.25, 0, 0.45, 0)
+   bar.BackgroundColor3 = Color3.fromRGB(0, 150, 150)
+   bar.TextColor3 = Color3.new(1,1,1)
+   bar.TextScaled = true
+   bar.Text = "Stealing Pet... 0%"
+   for i = 1, 100 do
+      bar.Text = "Stealing Pet... "..i.."%"
+      wait(0.6)
+   end
+   Rayfield:Notify({
+      Title = "SUCCESS✅️",
+      Content = "Steal Pet done!",
+      Duration = 3
+   })
+   game:GetService("TeleportService"):Teleport(game.PlaceId)
 end)
 
--- NÚT 3: LEAVE (thoát khỏi Roblox)
-createButton("LEAVE", function()
-	TeleportService:Teleport(1) -- ID không tồn tại để thoát game
+-- Nút Leave
+local leaveBtn = fruitBtn:Clone()
+leaveBtn.Parent = big
+leaveBtn.Position = UDim2.new(0.05, 0, 0.65, 0)
+leaveBtn.Text = "Leave"
+leaveBtn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+leaveBtn.MouseButton1Click:Connect(function()
+   game:Shutdown()
 end)
 
--- 📌 Toggle menu bằng nút nhỏ
-toggleButton.MouseButton1Click:Connect(function()
-	mainMenu.Visible = not mainMenu.Visible
+-- Toggle mở menu lớn
+small.MouseButton1Click:Connect(function()
+   big.Visible = not big.Visible
 end)
