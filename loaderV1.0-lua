@@ -1,50 +1,91 @@
--- UI Setup
-local player = game.Players.LocalPlayer
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
+local player = Players.LocalPlayer
+
+-- Tạo GUI
 local playerGui = player:WaitForChild("PlayerGui")
+local screenGui = Instance.new("ScreenGui", playerGui)
+screenGui.Name = "CustomUI"
 
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "MyCustomUI"
-screenGui.Parent = playerGui
-
+-- Khung chính
 local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 250, 0, 200)
-frame.Position = UDim2.new(0.5, -125, 0.5, -100)
-frame.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-frame.BackgroundTransparency = 0.1
+frame.Size = UDim2.new(0, 300, 0, 250)
+frame.Position = UDim2.new(0.5, -150, 0.5, -125)
+frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 frame.BorderSizePixel = 0
 frame.Parent = screenGui
 
--- UIListLayout để căn đều nút
-local layout = Instance.new("UIListLayout")
-layout.Padding = UDim.new(0, 10)
-layout.FillDirection = Enum.FillDirection.Vertical
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+-- Layout để xếp nút dọc
+local layout = Instance.new("UIListLayout", frame)
+layout.Padding = UDim.new(0, 15)
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
-layout.Parent = frame
+layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 
 -- Hàm tạo nút
 local function createButton(text, callback)
 	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(0, 200, 0, 40)
+	button.Size = UDim2.new(0, 200, 0, 50)
 	button.Text = text
-	button.Font = Enum.Font.SourceSans
-	button.TextSize = 20
+	button.Font = Enum.Font.SourceSansBold
+	button.TextSize = 22
 	button.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
 	button.TextColor3 = Color3.new(1, 1, 1)
 	button.Parent = frame
-
 	button.MouseButton1Click:Connect(callback)
 end
 
--- Tạo 3 nút
-createButton("SPAWM FAKE PET", function()
-	print("Bạn đã nhấn Nút 1")
+-- Danh sách pet ảo
+local petNames = {"Bunny", "Cat", "Duck", "Slime", "Bee"}
+
+-- Hàm tạo pet ảo
+local function spawnPetVisual()
+	local petModel = Instance.new("Model")
+	petModel.Name = petNames[math.random(1, #petNames)] .. "Pet"
+	petModel.Parent = workspace
+
+	-- Tạo phần thân giả
+	local body = Instance.new("Part")
+	body.Size = Vector3.new(2, 2, 2)
+	body.Shape = Enum.PartType.Ball
+	body.Position = player.Character and player.Character:FindFirstChild("HumanoidRootPart") and (player.Character.HumanoidRootPart.Position + Vector3.new(5, 0, 0)) or Vector3.new(0, 5, 0)
+	body.Anchored = true
+	body.BrickColor = BrickColor.Random()
+	body.Name = "Body"
+	body.Parent = petModel
+
+	-- Gắn thông tin
+	local billboard = Instance.new("BillboardGui", body)
+	billboard.Size = UDim2.new(0, 100, 0, 50)
+	billboard.StudsOffset = Vector3.new(0, 2.5, 0)
+	billboard.AlwaysOnTop = true
+
+	local label = Instance.new("TextLabel", billboard)
+	label.Size = UDim2.new(1, 0, 1, 0)
+	label.BackgroundTransparency = 1
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.TextStrokeTransparency = 0
+	label.TextScaled = true
+
+	local weight = math.random(1, 10) + math.random()
+	local age = math.random(1, 20)
+
+	label.Text = petModel.Name .. "\n" .. weight .. " kg, " .. age .. " tuổi"
+end
+
+-- Nút 1: SPAWN VISUAL PET
+createButton("SPAWN VISUAL PET", function()
+	spawnPetVisual()
 end)
 
+-- Nút 2: Placeholder
 createButton("TRADE SCAM", function()
-	print("Bạn đã nhấn Nút 2")
+	warn("Bạn chưa gán chức năng cho NÚT 2.")
 end)
 
+-- Nút 3: LEAVE GAME
 createButton("LEAVE", function()
-	print("Bạn đã nhấn Nút 3")
+	game:Shutdown() -- Chỉ hoạt động trong Studio
+	-- Nếu muốn rời game thật:
+	-- Teleport đến nơi không tồn tại để "thoát":
+	TeleportService:Teleport(1) -- gameId không hợp lệ để rời khỏi game
 end)
