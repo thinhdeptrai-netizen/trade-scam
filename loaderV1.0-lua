@@ -1,53 +1,47 @@
 local Players = game:GetService("Players")
-local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
-
--- Tạo GUI
 local playerGui = player:WaitForChild("PlayerGui")
-local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.Name = "CustomUI"
+
+-- Tạo ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "ToggleMenuUI"
 screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
 
--- Khung chính
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 300, 0, 250)
-frame.Position = UDim2.new(0.5, -150, 0.5, -125)
-frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true -- Cho phép kéo
-frame.Parent = screenGui
+-- 🔘 Nút nhỏ hình vuông (Toggle Button)
+local toggleButton = Instance.new("TextButton")
+toggleButton.Size = UDim2.new(0, 50, 0, 50)
+toggleButton.Position = UDim2.new(0, 20, 0, 20)
+toggleButton.Text = "≡" -- Biểu tượng menu
+toggleButton.Font = Enum.Font.SourceSansBold
+toggleButton.TextSize = 24
+toggleButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+toggleButton.TextColor3 = Color3.new(1, 1, 1)
+toggleButton.Parent = screenGui
 
--- Layout dọc cho các nút
-local layout = Instance.new("UIListLayout", frame)
-layout.Padding = UDim.new(0, 15)
-layout.VerticalAlignment = Enum.VerticalAlignment.Center
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+-- 🧾 Menu lớn (ẩn hiện)
+local mainFrame = Instance.new("Frame")
+mainFrame.Size = UDim2.new(0, 300, 0, 250)
+mainFrame.Position = UDim2.new(0.5, -150, 0.5, -125)
+mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+mainFrame.BorderSizePixel = 0
+mainFrame.Active = true
+mainFrame.Draggable = true
+mainFrame.Visible = false -- Bắt đầu ẩn
+mainFrame.Parent = screenGui
 
--- Hàm tạo nút
-local function createButton(text, callback)
-	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(0, 200, 0, 50)
-	button.Text = text
-	button.Font = Enum.Font.SourceSansBold
-	button.TextSize = 22
-	button.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-	button.TextColor3 = Color3.new(1, 1, 1)
-	button.Parent = frame
-	button.MouseButton1Click:Connect(callback)
-end
+-- Ví dụ: Thêm tiêu đề vào menu
+local title = Instance.new("TextLabel")
+title.Size = UDim2.new(1, 0, 0, 40)
+title.Position = UDim2.new(0, 0, 0, 0)
+title.BackgroundTransparency = 1
+title.Text = "Menu Lớn"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.TextScaled = true
+title.Font = Enum.Font.SourceSansBold
+title.Parent = mainFrame
 
--- Nút 1: Không làm gì cả
-createButton("SPAWN VISUAL PET", function()
-	-- Không có chức năng
-end)
-
--- Nút 2: Không làm gì cả
-createButton("NÚT 2", function()
-	-- Không có chức năng
-end)
-
--- Nút 3: Rời khỏi game
-createButton("LEAVE", function()
-	TeleportService:Teleport(1) -- Gửi đến một gameId không tồn tại để "thoát"
+-- 📌 Chức năng bật/tắt menu
+toggleButton.MouseButton1Click:Connect(function()
+	mainFrame.Visible = not mainFrame.Visible
 end)
