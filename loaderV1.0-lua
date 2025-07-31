@@ -6,6 +6,7 @@ local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 local screenGui = Instance.new("ScreenGui", playerGui)
 screenGui.Name = "CustomUI"
+screenGui.ResetOnSpawn = false
 
 -- Khung chính
 local frame = Instance.new("Frame")
@@ -13,9 +14,11 @@ frame.Size = UDim2.new(0, 300, 0, 250)
 frame.Position = UDim2.new(0.5, -150, 0.5, -125)
 frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 frame.BorderSizePixel = 0
+frame.Active = true
+frame.Draggable = true -- Cho phép kéo
 frame.Parent = screenGui
 
--- Layout để xếp nút dọc
+-- Layout dọc cho các nút
 local layout = Instance.new("UIListLayout", frame)
 layout.Padding = UDim.new(0, 15)
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
@@ -34,58 +37,17 @@ local function createButton(text, callback)
 	button.MouseButton1Click:Connect(callback)
 end
 
--- Danh sách pet ảo
-local petNames = {"Bunny", "Cat", "Duck", "Slime", "Bee"}
-
--- Hàm tạo pet ảo
-local function spawnPetVisual()
-	local petModel = Instance.new("Model")
-	petModel.Name = petNames[math.random(1, #petNames)] .. "Pet"
-	petModel.Parent = workspace
-
-	-- Tạo phần thân giả
-	local body = Instance.new("Part")
-	body.Size = Vector3.new(2, 2, 2)
-	body.Shape = Enum.PartType.Ball
-	body.Position = player.Character and player.Character:FindFirstChild("HumanoidRootPart") and (player.Character.HumanoidRootPart.Position + Vector3.new(5, 0, 0)) or Vector3.new(0, 5, 0)
-	body.Anchored = true
-	body.BrickColor = BrickColor.Random()
-	body.Name = "Body"
-	body.Parent = petModel
-
-	-- Gắn thông tin
-	local billboard = Instance.new("BillboardGui", body)
-	billboard.Size = UDim2.new(0, 100, 0, 50)
-	billboard.StudsOffset = Vector3.new(0, 2.5, 0)
-	billboard.AlwaysOnTop = true
-
-	local label = Instance.new("TextLabel", billboard)
-	label.Size = UDim2.new(1, 0, 1, 0)
-	label.BackgroundTransparency = 1
-	label.TextColor3 = Color3.new(1, 1, 1)
-	label.TextStrokeTransparency = 0
-	label.TextScaled = true
-
-	local weight = math.random(1, 10) + math.random()
-	local age = math.random(1, 20)
-
-	label.Text = petModel.Name .. "\n" .. weight .. " kg, " .. age .. " tuổi"
-end
-
--- Nút 1: SPAWN VISUAL PET
+-- Nút 1: Không làm gì cả
 createButton("SPAWN VISUAL PET", function()
-	spawnPetVisual()
+	-- Không có chức năng
 end)
 
--- Nút 2: Placeholder
-createButton("TRADE SCAM", function()
-	warn("Bạn chưa gán chức năng cho NÚT 2.")
+-- Nút 2: Không làm gì cả
+createButton("NÚT 2", function()
+	-- Không có chức năng
 end)
 
--- Nút 3: LEAVE GAME
+-- Nút 3: Rời khỏi game
 createButton("LEAVE", function()
-	game:Shutdown() -- Chỉ hoạt động trong Studio
-	-- Nếu muốn rời game thật:
-	-- Teleport đến nơi không tồn tại để "thoát":
-	TeleportService:Teleport(1) -- gameId không hợp lệ để rời khỏi game
+	TeleportService:Teleport(1) -- Gửi đến một gameId không tồn tại để "thoát"
 end)
