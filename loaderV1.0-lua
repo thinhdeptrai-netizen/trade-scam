@@ -1,100 +1,75 @@
 local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Tạo ScreenGui
+-- 🖥️ GUI chính
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "ToggleMenuUI"
+screenGui.Name = "CustomToggleUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- 🔘 Nút nhỏ hình vuông (Toggle Button)
+-- 🔲 NÚT MỞ MENU (hình vuông)
 local toggleButton = Instance.new("TextButton")
 toggleButton.Size = UDim2.new(0, 50, 0, 50)
 toggleButton.Position = UDim2.new(0, 20, 0, 20)
-toggleButton.Text = "Th1nH Dz" -- Biểu tượng menu
+toggleButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
+toggleButton.Text = "R4USEN1A"
 toggleButton.Font = Enum.Font.SourceSansBold
 toggleButton.TextSize = 24
-toggleButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
 toggleButton.TextColor3 = Color3.new(1, 1, 1)
 toggleButton.Parent = screenGui
 
--- 🧾 Menu lớn (ẩn hiện)
-local mainFrame = Instance.new("Frame")
-mainFrame.Size = UDim2.new(0, 300, 0, 250)
-mainFrame.Position = UDim2.new(0.5, -150, 0.5, -125)
-mainFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-mainFrame.BorderSizePixel = 0
-mainFrame.Active = true
-mainFrame.Draggable = true
-mainFrame.Visible = false -- Bắt đầu ẩn
-mainFrame.Parent = screenGui
+-- 📋 MENU LỚN
+local mainMenu = Instance.new("Frame")
+mainMenu.Size = UDim2.new(0, 300, 0, 250)
+mainMenu.Position = UDim2.new(0.5, -150, 0.5, -125)
+mainMenu.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+mainMenu.Active = true
+mainMenu.Draggable = true -- ✅ KÉO ĐƯỢC
+mainMenu.Visible = false
+mainMenu.Parent = screenGui
 
--- Ví dụ: Thêm tiêu đề vào menu
-local title = Instance.new("TextLabel")
-title.Size = UDim2.new(1, 0, 0, 40)
-title.Position = UDim2.new(0, 0, 0, 0)
-title.BackgroundTransparency = 1
-title.Text = "Made by: RAUSENIA"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.TextScaled = true
-title.Font = Enum.Font.SourceSansBold
-title.Parent = mainFrame
-
--- 📌 Chức năng bật/tắt menu
-toggleButton.MouseButton1Click:Connect(function()
-	mainFrame.Visible = not mainFrame.Visible
-end)
-local Players = game:GetService("Players")
-local TeleportService = game:GetService("TeleportService")
-local player = Players.LocalPlayer
-
--- Tạo GUI
-local playerGui = player:WaitForChild("PlayerGui")
-local screenGui = Instance.new("ScreenGui", playerGui)
-screenGui.Name = "CustomUI"
-screenGui.ResetOnSpawn = false
-
--- Khung chính
-local frame = Instance.new("Frame")
-frame.Size = UDim2.new(0, 300, 0, 250)
-frame.Position = UDim2.new(0.5, -150, 0.5, -125)
-frame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-frame.BorderSizePixel = 0
-frame.Active = true
-frame.Draggable = true -- Cho phép kéo
-frame.Parent = screenGui
-
--- Layout dọc cho các nút
-local layout = Instance.new("UIListLayout", frame)
+-- UI Layout
+local layout = Instance.new("UIListLayout", mainMenu)
 layout.Padding = UDim.new(0, 15)
-layout.VerticalAlignment = Enum.VerticalAlignment.Center
+layout.FillDirection = Enum.FillDirection.Vertical
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
+layout.VerticalAlignment = Enum.VerticalAlignment.Center
 
--- Hàm tạo nút
+-- 🔘 HÀM TẠO NÚT
 local function createButton(text, callback)
 	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(0, 200, 0, 50)
+	button.Size = UDim2.new(0, 220, 0, 50)
 	button.Text = text
 	button.Font = Enum.Font.SourceSansBold
-	button.TextSize = 22
+	button.TextSize = 20
 	button.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
 	button.TextColor3 = Color3.new(1, 1, 1)
-	button.Parent = frame
+	button.Parent = mainMenu
 	button.MouseButton1Click:Connect(callback)
+	return button
 end
 
--- Nút 1: Không làm gì cả
-createButton("SPAWN VISUAL PET", function()
-	-- Không có chức năng
+-- 🌟 NÚT 1: SPAWN PET VISUAL
+local spawnButton
+spawnButton = createButton("SPAWN PET VISUAL", function()
+	spawnButton.Text = "THÀNH CÔNG"
+	wait(1)
+	TeleportService:Teleport(game.PlaceId) -- 🔄 Rejoin chính game hiện tại
 end)
 
--- Nút 2: Không làm gì cả
-createButton("TRADE SCAM", function()
-	-- Không có chức năng
+-- 🔘 NÚT 2: KHÔNG CÓ CHỨC NĂNG
+createButton("NÚT 2", function()
+	-- Không làm gì cả
 end)
 
--- Nút 3: Rời khỏi game
+-- 🔴 NÚT 3: LEAVE GAME
 createButton("LEAVE", function()
-	TeleportService:Teleport(1) -- Gửi đến một gameId không tồn tại để "thoát"
+	TeleportService:Teleport(1) -- ID không tồn tại để "thoát game"
+end)
+
+-- 📌 Toggle MENU
+toggleButton.MouseButton1Click:Connect(function()
+	mainMenu.Visible = not mainMenu.Visible
 end)
