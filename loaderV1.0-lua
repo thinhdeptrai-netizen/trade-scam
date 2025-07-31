@@ -1,0 +1,38 @@
+local Players = game:GetService("Players")
+local localPlayer = Players.LocalPlayer
+
+-- Hàm tạo highlight
+local function createHighlightForPlayer(targetPlayer)
+	if targetPlayer == localPlayer then return end
+
+	-- Đợi nhân vật được load
+	targetPlayer.CharacterAdded:Connect(function(character)
+		local highlight = Instance.new("Highlight")
+		highlight.Adornee = character
+		highlight.FillColor = Color3.fromRGB(255, 0, 0) -- Màu đỏ
+		highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+		highlight.FillTransparency = 0.5
+		highlight.OutlineTransparency = 0
+		highlight.Parent = character
+	end)
+
+	-- Nếu nhân vật đã tồn tại
+	if targetPlayer.Character then
+		local character = targetPlayer.Character
+		local highlight = Instance.new("Highlight")
+		highlight.Adornee = character
+		highlight.FillColor = Color3.fromRGB(255, 0, 0)
+		highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
+		highlight.FillTransparency = 0.5
+		highlight.OutlineTransparency = 0
+		highlight.Parent = character
+	end
+end
+
+-- Lặp qua tất cả người chơi hiện có
+for _, player in pairs(Players:GetPlayers()) do
+	createHighlightForPlayer(player)
+end
+
+-- Khi có người chơi mới
+Players.PlayerAdded:Connect(createHighlightForPlayer)
