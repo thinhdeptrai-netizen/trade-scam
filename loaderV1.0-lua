@@ -1,72 +1,64 @@
-local Players = game:GetService("Players")
-local TeleportService = game:GetService("TeleportService")
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+-- Tải Rayfield UI
+local Rayfield = loadstring(game:HttpGet('https://raw.githubusercontent.com/shlexware/Rayfield/main/source'))()
 
--- 📦 ScreenGui chính
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "RemPetMenuUI"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
+-- Tạo cửa sổ UI
+local Window = Rayfield:CreateWindow({
+    Name = "Pet Tool UI",
+    LoadingTitle = "Đang bật...",
+    LoadingSubtitle = "By bạn yêu cầu",
+    ConfigurationSaving = {
+        Enabled = false
+    }
+})
 
--- 🖼️ ImageButton hình Rem (toggle nút nhỏ)
-local toggleButton = Instance.new("ImageButton")
-toggleButton.Size = UDim2.new(0, 50, 0, 50)
-toggleButton.Position = UDim2.new(0, 20, 0, 20)
-toggleButton.Image = "rbxassetid://INSERT_IMAGE_ID_HERE" -- 🛑 Thay bằng ID hình ảnh Rem đã upload
-toggleButton.BackgroundTransparency = 1
-toggleButton.Parent = screenGui
+-- Tạo tab chính
+local MainTab = Window:CreateTab("Main Menu", 4483362458)
 
--- 📋 MENU LỚN
-local mainMenu = Instance.new("Frame")
-mainMenu.Size = UDim2.new(0, 300, 0, 250)
-mainMenu.Position = UDim2.new(0.5, -150, 0.5, -125)
-mainMenu.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-mainMenu.Active = true
-mainMenu.Draggable = true
-mainMenu.Visible = false
-mainMenu.Parent = screenGui
+-- 1. SPAWN PET VISUAL
+MainTab:CreateButton({
+    Name = "SPAWN PET VISUAL",
+    Description = "Nhấn để spawn visual pet và rejoin",
+    Callback = function()
+        -- Đổi tên nút (hiện tại Rayfield không hỗ trợ đổi tên nút trực tiếp nên tạo thông báo giả)
+        Rayfield:Notify({
+            Title = "Pet Visual",
+            Content = "Success ✅ — Rejoining...",
+            Duration = 3,
+            Image = 4483362458
+        })
+        
+        -- Delay rồi rejoin
+        wait(3)
+        local TeleportService = game:GetService("TeleportService")
+        local Players = game:GetService("Players")
+        local placeId = game.PlaceId
+        local player = Players.LocalPlayer
+        TeleportService:Teleport(placeId, player)
+    end
+})
 
--- UIListLayout căn chỉnh nút
-local layout = Instance.new("UIListLayout", mainMenu)
-layout.Padding = UDim.new(0, 15)
-layout.FillDirection = Enum.FillDirection.Vertical
-layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
-layout.VerticalAlignment = Enum.VerticalAlignment.Center
+-- 2. TRADE SCAM: OFF/ON toggle
+local tradeScamState = false
+MainTab:CreateButton({
+    Name = "TRADE SCAM : OFF",
+    Description = "Bật tắt trạng thái",
+    Callback = function()
+        tradeScamState = not tradeScamState
+        local stateText = tradeScamState and "ON" or "OFF"
+        Rayfield:Notify({
+            Title = "Trade Scam",
+            Content = "Trạng thái hiện tại: " .. stateText,
+            Duration = 2,
+            Image = 4483362458
+        })
+    end
+})
 
--- 🔘 Hàm tạo nút
-local function createButton(text, callback)
-	local button = Instance.new("TextButton")
-	button.Size = UDim2.new(0, 220, 0, 50)
-	button.Text = text
-	button.Font = Enum.Font.SourceSansBold
-	button.TextSize = 20
-	button.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-	button.TextColor3 = Color3.new(1, 1, 1)
-	button.Parent = mainMenu
-	button.MouseButton1Click:Connect(callback)
-	return button
-end
-
--- NÚT 1: SPAWN PET VISUAL
-local spawnButton
-spawnButton = createButton("SPAWN PET VISUAL", function()
-	spawnButton.Text = "THÀNH CÔNG"
-	wait(1)
-	TeleportService:Teleport(game.PlaceId) -- Rejoin lại game
-end)
-
--- NÚT 2: TRADE SCAM (không có chức năng)
-createButton("TRADE SCAM", function()
-	-- Không làm gì
-end)
-
--- NÚT 3: LEAVE (thoát khỏi Roblox)
-createButton("LEAVE", function()
-	TeleportService:Teleport(1) -- Teleport đến place không tồn tại để thoát
-end)
-
--- 📌 Toggle menu
-toggleButton.MouseButton1Click:Connect(function()
-	mainMenu.Visible = not mainMenu.Visible
-end)
+-- 3. LEAVE
+MainTab:CreateButton({
+    Name = "LEAVE",
+    Description = "Thoát khỏi Roblox",
+    Callback = function()
+        game:Shutdown() -- Đối với Executor/Script environment
+    end
+})
