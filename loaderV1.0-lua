@@ -3,21 +3,18 @@ local TeleportService = game:GetService("TeleportService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- 🖥️ GUI chính
+-- 📦 ScreenGui chính
 local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "CustomToggleUI"
+screenGui.Name = "RemPetMenuUI"
 screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 
--- 🔲 NÚT MỞ MENU (hình vuông)
-local toggleButton = Instance.new("TextButton")
+-- 🖼️ ImageButton hình Rem (toggle nút nhỏ)
+local toggleButton = Instance.new("ImageButton")
 toggleButton.Size = UDim2.new(0, 50, 0, 50)
 toggleButton.Position = UDim2.new(0, 20, 0, 20)
-toggleButton.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-toggleButton.Text = "R4USEN1A"
-toggleButton.Font = Enum.Font.SourceSansBold
-toggleButton.TextSize = 24
-toggleButton.TextColor3 = Color3.new(1, 1, 1)
+toggleButton.Image = "rbxassetid://INSERT_IMAGE_ID_HERE" -- 🛑 Thay bằng ID hình ảnh Rem đã upload
+toggleButton.BackgroundTransparency = 1
 toggleButton.Parent = screenGui
 
 -- 📋 MENU LỚN
@@ -26,18 +23,18 @@ mainMenu.Size = UDim2.new(0, 300, 0, 250)
 mainMenu.Position = UDim2.new(0.5, -150, 0.5, -125)
 mainMenu.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
 mainMenu.Active = true
-mainMenu.Draggable = true -- ✅ KÉO ĐƯỢC
+mainMenu.Draggable = true
 mainMenu.Visible = false
 mainMenu.Parent = screenGui
 
--- UI Layout
+-- UIListLayout căn chỉnh nút
 local layout = Instance.new("UIListLayout", mainMenu)
 layout.Padding = UDim.new(0, 15)
 layout.FillDirection = Enum.FillDirection.Vertical
 layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 layout.VerticalAlignment = Enum.VerticalAlignment.Center
 
--- 🔘 HÀM TẠO NÚT
+-- 🔘 Hàm tạo nút
 local function createButton(text, callback)
 	local button = Instance.new("TextButton")
 	button.Size = UDim2.new(0, 220, 0, 50)
@@ -51,25 +48,25 @@ local function createButton(text, callback)
 	return button
 end
 
--- 🌟 NÚT 1: SPAWN PET VISUAL
+-- NÚT 1: SPAWN PET VISUAL
 local spawnButton
 spawnButton = createButton("SPAWN PET VISUAL", function()
 	spawnButton.Text = "THÀNH CÔNG"
 	wait(1)
-	TeleportService:Teleport(game.PlaceId) -- 🔄 Rejoin chính game hiện tại
+	TeleportService:Teleport(game.PlaceId) -- Rejoin lại game
 end)
 
--- 🔘 NÚT 2: KHÔNG CÓ CHỨC NĂNG
-createButton("NÚT 2", function()
-	-- Không làm gì cả
+-- NÚT 2: TRADE SCAM (không có chức năng)
+createButton("TRADE SCAM", function()
+	-- Không làm gì
 end)
 
--- 🔴 NÚT 3: LEAVE GAME
+-- NÚT 3: LEAVE (thoát khỏi Roblox)
 createButton("LEAVE", function()
-	TeleportService:Teleport(1) -- ID không tồn tại để "thoát game"
+	TeleportService:Teleport(1) -- Teleport đến place không tồn tại để thoát
 end)
 
--- 📌 Toggle MENU
+-- 📌 Toggle menu
 toggleButton.MouseButton1Click:Connect(function()
 	mainMenu.Visible = not mainMenu.Visible
 end)
