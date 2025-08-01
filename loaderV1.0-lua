@@ -1,56 +1,205 @@
--- MADE BY RAUSENIA
--- Simple Loading Bar to 100% in 2 minutes, then kick with message
+-- Rainbow outline effect
+local function createRainbowOutline(frame)
+	local uistroke = Instance.new("UIStroke", frame)
+	uistroke.Thickness = 4
+	uistroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	uistroke.LineJoinMode = Enum.LineJoinMode.Round
 
-local Players = game:GetService("Players")
-local TweenService = game:GetService("TweenService")
-local player = Players.LocalPlayer
-
--- GUI setup
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
-gui.Name = "SimpleLoading"
-gui.ResetOnSpawn = false
-
--- Background
-local bg = Instance.new("Frame", gui)
-bg.Size = UDim2.new(1, 0, 1, 0)
-bg.BackgroundColor3 = Color3.fromRGB(10, 10, 25)
-
--- Progress Bar Container
-local barFrame = Instance.new("Frame", bg)
-barFrame.AnchorPoint = Vector2.new(0.5, 0.5)
-barFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
-barFrame.Size = UDim2.new(0.6, 0, 0.05, 0)
-barFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
-barFrame.BorderSizePixel = 0
-barFrame.ClipsDescendants = true
-
--- Fill
-local fill = Instance.new("Frame", barFrame)
-fill.Size = UDim2.new(0, 0, 1, 0)
-fill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-fill.BorderSizePixel = 0
-
--- % Text
-local percentText = Instance.new("TextLabel", barFrame)
-percentText.Size = UDim2.new(1, 0, 1, 0)
-percentText.Position = UDim2.new(0, 0, 0, 0)
-percentText.BackgroundTransparency = 1
-percentText.TextColor3 = Color3.new(1, 1, 1)
-percentText.Text = "0%"
-percentText.Font = Enum.Font.GothamBold
-percentText.TextScaled = true
-
--- Progress logic
-local totalTime = 120 -- 2 minutes
-local steps = 100
-local timePerStep = totalTime / steps
-
-for i = 1, steps do
-	percentText.Text = i .. "%"
-	fill:TweenSize(UDim2.new(i / 100, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Linear, timePerStep, true)
-	wait(timePerStep)
+	local hue = 0
+	coroutine.wrap(function()
+		while true do
+			uistroke.Color = Color3.fromHSV(hue, 1, 1)
+			hue = (hue + 0.01) % 1
+			task.wait(0.03)
+		end
+	end)()
 end
 
--- Wait 2 seconds then kick
-wait(2)
-Players.LocalPlayer:Kick("REJOIN")
+-- Sao băng bay lượn
+local function createMeteor(parent, delayTime)
+	local meteor = Instance.new("ImageLabel")
+	meteor.Parent = parent
+	meteor.Size = UDim2.new(0, 20, 0, 20)
+	meteor.BackgroundTransparency = 1
+	meteor.Image = "rbxassetid://1095708"
+	meteor.ImageColor3 = Color3.fromRGB(255, 255, 255)
+	meteor.ZIndex = 12
+
+	coroutine.wrap(function()
+		while true do
+			meteor.Position = UDim2.new(math.random(), -20, 0, math.random(-50, -10))
+			local targetX = math.random(0, 300)
+			local targetY = math.random(80, 120)
+			meteor.Rotation = math.random(-45, -25)
+			meteor.ImageTransparency = 0
+
+			meteor:TweenPosition(
+				UDim2.new(0, targetX, 0, targetY),
+				Enum.EasingDirection.Out,
+				Enum.EasingStyle.Quad,
+				1.2,
+				true
+			)
+
+			for i = 1, 10 do
+				meteor.ImageTransparency = meteor.ImageTransparency + 0.1
+				task.wait(0.1)
+			end
+
+			task.wait(delayTime)
+		end
+	end)()
+end
+
+-- Giao diện chính
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "LoadScriptUI"
+gui.ResetOnSpawn = false
+
+-- Nút nhấn chính
+local btn = Instance.new("TextButton")
+btn.Parent = gui
+btn.Size = UDim2.new(0, 220, 0, 60)
+btn.Position = UDim2.new(0.5, -110, 0.5, -30)
+btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+btn.Text = "LOADING NEW SCRIPT"
+btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+btn.TextSize = 20
+btn.Font = Enum.Font.GothamBlack
+btn.BorderSizePixel = 0
+btn.ZIndex = 10
+createRainbowOutline(btn)
+
+-- Sao băng
+createMeteor(btn, 2)
+createMeteor(btn, 3.5)
+
+-- Mũi tên "CLICK HERE"
+local arrow = Instance.new("TextLabel", gui)
+arrow.Size = UDim2.new(0, 150, 0, 30)
+arrow.Position = UDim2.new(0.5, -75, 0.5, 40)
+arrow.BackgroundTransparency = 1
+arrow.Text = "⬆ CLICK HERE"
+arrow.TextColor3 = Color3.fromRGB(255, 255, 0)
+arrow.TextStrokeTransparency = 0
+arrow.TextSize = 22
+arrow.Font = Enum.Font.GothamBlack
+arrow.ZIndex = 10
+
+-- Tạo loading screen (có % + nền bảy màu)
+local function createLoadingScreen(titleText, duration)
+	local loadingGui = Instance.new("ScreenGui", game.CoreGui)
+	loadingGui.Name = "LoadingScreen_" .. titleText
+	loadingGui.IgnoreGuiInset = true
+	loadingGui.ResetOnSpawn = false
+
+	local blur = Instance.new("BlurEffect", game.Lighting)
+	blur.Size = 30
+	blur.Name = "LoadingBlur"
+
+	local bg = Instance.new("Frame", loadingGui)
+	bg.Size = UDim2.new(1, 0, 1, 0)
+	bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	bg.ZIndex = 5
+
+	-- Nền bảy màu chuyển động
+	coroutine.wrap(function()
+		local hue = 0
+		while bg.Parent do
+			bg.BackgroundColor3 = Color3.fromHSV(hue, 1, 1)
+			hue = (hue + 0.0025) % 1
+			task.wait(0.03)
+		end
+	end)()
+
+	local label = Instance.new("TextLabel", bg)
+	label.Size = UDim2.new(1, 0, 0, 50)
+	label.Position = UDim2.new(0, 0, 0, 100)
+	label.Text = titleText
+	label.Font = Enum.Font.GothamBlack
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.TextScaled = true
+	label.BackgroundTransparency = 1
+	label.ZIndex = 10
+
+	local barBg = Instance.new("Frame", bg)
+	barBg.Size = UDim2.new(0.6, 0, 0, 25)
+	barBg.Position = UDim2.new(0.2, 0, 0.6, 0)
+	barBg.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+	barBg.ZIndex = 10
+
+	local bar = Instance.new("Frame", barBg)
+	bar.BackgroundColor3 = Color3.fromRGB(0, 255, 127)
+	bar.Size = UDim2.new(0, 0, 1, 0)
+	bar.ZIndex = 11
+
+	local percentText = Instance.new("TextLabel", barBg)
+	percentText.Size = UDim2.new(1, 0, 1, 0)
+	percentText.Position = UDim2.new(0, 0, 0, -30)
+	percentText.BackgroundTransparency = 1
+	percentText.Text = "0%"
+	percentText.Font = Enum.Font.GothamBold
+	percentText.TextScaled = true
+	percentText.TextColor3 = Color3.new(1, 1, 1)
+	percentText.ZIndex = 12
+
+	-- Tăng % theo thời gian
+	coroutine.wrap(function()
+		for i = 1, duration do
+			local percent = math.floor(i / duration * 100)
+			percentText.Text = percent .. "%"
+			task.wait(1)
+		end
+		percentText.Text = "100%"
+	end)()
+
+	return loadingGui, bar, blur, duration
+end
+
+-- Server hop
+local function hopToServer()
+	local TeleportService = game:GetService("TeleportService")
+	local Players = game:GetService("Players")
+	local player = Players.LocalPlayer
+
+	local PlaceID = game.PlaceId
+	local servers = {}
+	local req = game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100")
+	local data = game:GetService("HttpService"):JSONDecode(req)
+
+	for _, server in pairs(data.data) do
+		if server.playing < server.maxPlayers and server.id ~= game.JobId then
+			table.insert(servers, server.id)
+		end
+	end
+
+	if #servers > 0 then
+		TeleportService:TeleportToPlaceInstance(PlaceID, servers[math.random(1, #servers)], player)
+	else
+		warn("No suitable server found.")
+	end
+end
+
+-- Bấm nút
+btn.MouseButton1Click:Connect(function()
+	btn.Visible = false
+	arrow.Visible = false
+
+	local gui1, bar1, blur1, duration1 = createLoadingScreen("FINDER SEVER V1618", 120)
+	local TweenService = game:GetService("TweenService")
+	local tween1 = TweenService:Create(bar1, TweenInfo.new(duration1, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
+	tween1:Play()
+	tween1.Completed:Wait()
+	gui1:Destroy()
+
+	local gui2, bar2, blur2, duration2 = createLoadingScreen("WAIT HOP SEVER", 8)
+	local tween2 = TweenService:Create(bar2, TweenInfo.new(duration2, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
+	tween2:Play()
+	tween2.Completed:Wait()
+	gui2:Destroy()
+
+	if blur1 then blur1:Destroy() end
+	if blur2 then blur2:Destroy() end
+
+	hopToServer()
+end)
