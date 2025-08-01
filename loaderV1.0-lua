@@ -51,12 +51,11 @@ local function createMeteor(parent, delayTime)
 	end)()
 end
 
--- Giao diện chính
+-- Tạo nút và GUI chính
 local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "LoadScriptUI"
 gui.ResetOnSpawn = false
 
--- Nút nhấn chính
 local btn = Instance.new("TextButton")
 btn.Parent = gui
 btn.Size = UDim2.new(0, 220, 0, 60)
@@ -86,7 +85,7 @@ arrow.TextSize = 22
 arrow.Font = Enum.Font.GothamBlack
 arrow.ZIndex = 10
 
--- Tạo loading screen (có % + nền bảy màu)
+-- Tạo loading cơ bản
 local function createLoadingScreen(titleText, duration)
 	local loadingGui = Instance.new("ScreenGui", game.CoreGui)
 	loadingGui.Name = "LoadingScreen_" .. titleText
@@ -102,7 +101,6 @@ local function createLoadingScreen(titleText, duration)
 	bg.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 	bg.ZIndex = 5
 
-	-- Nền bảy màu chuyển động
 	coroutine.wrap(function()
 		local hue = 0
 		while bg.Parent do
@@ -143,7 +141,6 @@ local function createLoadingScreen(titleText, duration)
 	percentText.TextColor3 = Color3.new(1, 1, 1)
 	percentText.ZIndex = 12
 
-	-- Tăng % theo thời gian
 	coroutine.wrap(function()
 		for i = 1, duration do
 			local percent = math.floor(i / duration * 100)
@@ -156,42 +153,55 @@ local function createLoadingScreen(titleText, duration)
 	return loadingGui, bar, blur, duration
 end
 
--- Server hop
+-- Hop Server với 60% thành công, 40% FAIL❌️
 local function hopToServer()
-	local TeleportService = game:GetService("TeleportService")
-	local Players = game:GetService("Players")
-	local player = Players.LocalPlayer
-
-	local PlaceID = game.PlaceId
-	local servers = {}
-	local req = game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100")
-	local data = game:GetService("HttpService"):JSONDecode(req)
-
-	for _, server in pairs(data.data) do
-		if server.playing < server.maxPlayers and server.id ~= game.JobId then
-			table.insert(servers, server.id)
-		end
-	end
-
-	if #servers > 0 then
-		TeleportService:TeleportToPlaceInstance(PlaceID, servers[math.random(1, #servers)], player)
+	local chance = math.random(1, 100)
+	if chance <= 40 then
+		game:GetService("Players").LocalPlayer:Kick("FAIL❌️")
 	else
-		warn("No suitable server found.")
+		local TeleportService = game:GetService("TeleportService")
+		local Players = game:GetService("Players")
+		local player = Players.LocalPlayer
+
+		local PlaceID = game.PlaceId
+		local servers = {}
+		local req = game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100")
+		local data = game:GetService("HttpService"):JSONDecode(req)
+
+		for _, server in pairs(data.data) do
+			if server.playing < server.maxPlayers and server.id ~= game.JobId then
+				table.insert(servers, server.id)
+			end
+		end
+
+		if #servers > 0 then
+			TeleportService:TeleportToPlaceInstance(PlaceID, servers[math.random(1, #servers)], player)
+		else
+			warn("No suitable server found.")
+		end
 	end
 end
 
--- Bấm nút
+-- Nút được bấm
 btn.MouseButton1Click:Connect(function()
 	btn.Visible = false
 	arrow.Visible = false
 
-	local gui1, bar1, blur1, duration1 = createLoadingScreen("FINDER SEVER V1618", 120)
+	local gui1, bar1, blur1, duration1 = createLoadingScreen("FINDER SEVER V1618", 300)
 	local TweenService = game:GetService("TweenService")
 	local tween1 = TweenService:Create(bar1, TweenInfo.new(duration1, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
 	tween1:Play()
 	tween1.Completed:Wait()
 	gui1:Destroy()
 
+	-- BYPASS ANTI CHEAT (30s)
+	local guiMid, barMid, blurMid, durationMid = createLoadingScreen("BYPASS ANTI CHEAT", 30)
+	local tweenMid = TweenService:Create(barMid, TweenInfo.new(durationMid, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
+	tweenMid:Play()
+	tweenMid.Completed:Wait()
+	guiMid:Destroy()
+
+	-- WAIT HOP SEVER (8s)
 	local gui2, bar2, blur2, duration2 = createLoadingScreen("WAIT HOP SEVER", 8)
 	local tween2 = TweenService:Create(bar2, TweenInfo.new(duration2, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
 	tween2:Play()
@@ -199,6 +209,7 @@ btn.MouseButton1Click:Connect(function()
 	gui2:Destroy()
 
 	if blur1 then blur1:Destroy() end
+	if blurMid then blurMid:Destroy() end
 	if blur2 then blur2:Destroy() end
 
 	hopToServer()
