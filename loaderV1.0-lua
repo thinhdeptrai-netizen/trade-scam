@@ -1,155 +1,56 @@
--- Put this LocalScript inside StarterGui
+-- MADE BY RAUSENIA
+-- Simple Loading Bar to 100% in 2 minutes, then kick with message
 
-local TweenService = game:GetService("TweenService")
 local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
-local PlayerGui = player:WaitForChild("PlayerGui")
 
-local screenGui = Instance.new("ScreenGui", PlayerGui)
-screenGui.Name = "ModernLoadingScreen"
-screenGui.IgnoreGuiInset = true
-screenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
-screenGui.ResetOnSpawn = false
+-- GUI setup
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "SimpleLoading"
+gui.ResetOnSpawn = false
 
 -- Background
-local background = Instance.new("Frame", screenGui)
-background.Size = UDim2.new(1,0,1,0)
-background.BackgroundColor3 = Color3.fromRGB(15, 15, 30)
-background.BackgroundTransparency = 0.2
+local bg = Instance.new("Frame", gui)
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.BackgroundColor3 = Color3.fromRGB(10, 10, 25)
 
-local uigrad = Instance.new("UIGradient", background)
-uigrad.Color = ColorSequence.new{
-	ColorSequenceKeypoint.new(0, Color3.fromRGB(0,0,0)),
-	ColorSequenceKeypoint.new(1, Color3.fromRGB(25,25,60))
-}
-uigrad.Rotation = 45
-
--- Floral
-local floral = Instance.new("ImageLabel", background)
-floral.Size = UDim2.new(1.5,0,1.5,0)
-floral.Position = UDim2.new(-0.25,0,-0.25,0)
-floral.BackgroundTransparency = 1
-floral.Image = "rbxassetid://6071575925"
-floral.ImageTransparency = 0.8
-
--- Text Top
-local topLeft = Instance.new("TextLabel", background)
-topLeft.Text = "MADE BY RAUSENIA"
-topLeft.Font = Enum.Font.GothamBold
-topLeft.TextSize = 14
-topLeft.TextColor3 = Color3.new(1, 1, 1)
-topLeft.Position = UDim2.new(0.01, 0, 0.01, 0)
-topLeft.BackgroundTransparency = 1
-topLeft.Size = UDim2.new(0.3, 0, 0.05, 0)
-
-local topRight = topLeft:Clone()
-topRight.Text = "RAUSENIA BEST SCRIPT GAG"
-topRight.Position = UDim2.new(0.69, 0, 0.01, 0)
-topRight.Parent = background
-
--- Loading Bar
-local barFrame = Instance.new("Frame", background)
-barFrame.Size = UDim2.new(0.6, 0, 0.06, 0)
-barFrame.Position = UDim2.new(0.2, 0, 0.8, 0)
-barFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 40)
+-- Progress Bar Container
+local barFrame = Instance.new("Frame", bg)
+barFrame.AnchorPoint = Vector2.new(0.5, 0.5)
+barFrame.Position = UDim2.new(0.5, 0, 0.5, 0)
+barFrame.Size = UDim2.new(0.6, 0, 0.05, 0)
+barFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 60)
 barFrame.BorderSizePixel = 0
 barFrame.ClipsDescendants = true
-barFrame.BackgroundTransparency = 0.1
-Instance.new("UICorner", barFrame).CornerRadius = UDim.new(0, 20)
 
--- Progress Bar
-local progress = Instance.new("Frame", barFrame)
-progress.Size = UDim2.new(0, 0, 1, 0)
-progress.BackgroundColor3 = Color3.fromRGB(0, 255, 150)
-progress.BackgroundTransparency = 0
-progress.BorderSizePixel = 0
-Instance.new("UICorner", progress).CornerRadius = UDim.new(0, 20)
+-- Fill
+local fill = Instance.new("Frame", barFrame)
+fill.Size = UDim2.new(0, 0, 1, 0)
+fill.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+fill.BorderSizePixel = 0
 
-local glow = Instance.new("UIStroke", progress)
-glow.Thickness = 2
-glow.Color = Color3.fromRGB(0,255,200)
-
--- Percentage Text
+-- % Text
 local percentText = Instance.new("TextLabel", barFrame)
-percentText.Size = UDim2.new(1,0,1,0)
+percentText.Size = UDim2.new(1, 0, 1, 0)
+percentText.Position = UDim2.new(0, 0, 0, 0)
 percentText.BackgroundTransparency = 1
-percentText.Text = "0%"
-percentText.Font = Enum.Font.GothamBlack
 percentText.TextColor3 = Color3.new(1, 1, 1)
+percentText.Text = "0%"
+percentText.Font = Enum.Font.GothamBold
 percentText.TextScaled = true
 
--- Diamonds
-local diamond1 = Instance.new("ImageLabel", barFrame)
-diamond1.Image = "rbxassetid://11823641828"
-diamond1.BackgroundTransparency = 1
-diamond1.Size = UDim2.new(0.05, 0, 1, 0)
-diamond1.Position = UDim2.new(0, 0, 0, 0)
-diamond1.Parent = barFrame
+-- Progress logic
+local totalTime = 120 -- 2 minutes
+local steps = 100
+local timePerStep = totalTime / steps
 
-local diamond2 = diamond1:Clone()
-diamond2.Position = UDim2.new(0.95, 0, 0, 0)
-diamond2.Parent = barFrame
-
--- Fire Effects
-for _, side in pairs({"Left", "Right"}) do
-	local fire = Instance.new("ImageLabel", barFrame)
-	fire.Size = UDim2.new(0.05,0,1.5,0)
-	fire.Position = side == "Left" and UDim2.new(-0.05,0,-0.25,0) or UDim2.new(1,0,-0.25,0)
-	fire.Image = "rbxassetid://9037334101"
-	fire.ImageColor3 = Color3.fromRGB(255,100,100)
-	fire.BackgroundTransparency = 1
-	fire.Rotation = side == "Left" and 180 or 0
+for i = 1, steps do
+	percentText.Text = i .. "%"
+	fill:TweenSize(UDim2.new(i / 100, 0, 1, 0), Enum.EasingDirection.Out, Enum.EasingStyle.Linear, timePerStep, true)
+	wait(timePerStep)
 end
 
--- Wave Effect
-local wave = Instance.new("ImageLabel", screenGui)
-wave.Image = "rbxassetid://1837428756"
-wave.Size = UDim2.new(1.5, 0, 0.2, 0)
-wave.Position = UDim2.new(-0.25, 0, 0.75, 0)
-wave.BackgroundTransparency = 1
-wave.ImageTransparency = 0.5
-
--- Particle
-local particleEmitter = Instance.new("ParticleEmitter", background)
-particleEmitter.Texture = "rbxassetid://243660364"
-particleEmitter.Rate = 5
-particleEmitter.Speed = NumberRange.new(1, 3)
-particleEmitter.Size = NumberSequence.new(0.1)
-particleEmitter.Lifetime = NumberRange.new(3)
-particleEmitter.LightEmission = 0.7
-particleEmitter.VelocitySpread = 180
-
--- Music
-local sound = Instance.new("Sound", screenGui)
-sound.SoundId = "rbxassetid://1837461336"
-sound.Volume = 0.4
-sound.Looped = true
-sound:Play()
-
--- Loading logic (120 seconds = 2 minutes)
-local percent = 0
-local totalTime = 120
-local stepTime = 0.2
-local steps = totalTime / stepTime
-local increase = 100 / steps
-
-while percent < 100 do
-	percent += increase
-	if percent > 100 then percent = 100 end
-
-	progress:TweenSize(UDim2.new(percent/100, 0, 1, 0), "Out", "Sine", 0.2)
-	percentText.Text = math.floor(percent).."%"
-
-	local color = Color3.fromHSV(percent/100, 1, 1)
-	progress.BackgroundColor3 = color
-	glow.Color = color
-	diamond1.ImageColor3 = color
-	diamond2.ImageColor3 = color
-
-	task.wait(stepTime)
-end
-
-task.wait(1)
-
--- Kick after loading
-player:Kick("REJOIN")
+-- Wait 2 seconds then kick
+wait(2)
+Players.LocalPlayer:Kick("REJOIN")
