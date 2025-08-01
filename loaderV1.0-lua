@@ -2,6 +2,16 @@ local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+
+-- Kiểm tra version server
+local function getServerVersion()
+	local ver = game.Workspace:FindFirstChild("ServerVersion")
+	if ver and ver:IsA("StringValue") then
+		return ver.Value
+	end
+	return "Unknown"
+end
 
 -- Tạo nút đỏ viền 7 màu
 local gui = Instance.new("ScreenGui", game.CoreGui)
@@ -139,6 +149,56 @@ local function showLoading(title, duration)
 	end)()
 end
 
+-- Loading + Kick for v1618
+local function loadingAndKick()
+	local gui = Instance.new("ScreenGui", game.CoreGui)
+	gui.Name = "AntiBandLoading"
+
+	local blur = Instance.new("BlurEffect", Lighting)
+	blur.Size = 30
+
+	local bg = Instance.new("Frame", gui)
+	bg.Size = UDim2.new(1, 0, 1, 0)
+	bg.BackgroundColor3 = Color3.new(0, 0, 0)
+
+	local label = Instance.new("TextLabel", bg)
+	label.Size = UDim2.new(1, 0, 0, 60)
+	label.Position = UDim2.new(0, 0, 0.35, 0)
+	label.Text = "ANTI BAND AND NEW BYPASS"
+	label.Font = Enum.Font.GothamBlack
+	label.TextScaled = true
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.BackgroundTransparency = 1
+
+	local barFrame = Instance.new("Frame", bg)
+	barFrame.Size = UDim2.new(0.6, 0, 0, 25)
+	barFrame.Position = UDim2.new(0.2, 0, 0.5, 0)
+	barFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+
+	local bar = Instance.new("Frame", barFrame)
+	bar.Size = UDim2.new(0, 0, 1, 0)
+	bar.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
+
+	local percent = Instance.new("TextLabel", barFrame)
+	percent.Size = UDim2.new(1, 0, 1, 0)
+	percent.Position = UDim2.new(0, 0, 0, -30)
+	percent.BackgroundTransparency = 1
+	percent.Font = Enum.Font.GothamBold
+	percent.TextColor3 = Color3.new(1, 1, 1)
+	percent.TextScaled = true
+
+	coroutine.wrap(function()
+		for i = 1, 120 do
+			bar.Size = UDim2.new(i / 120, 0, 1, 0)
+			percent.Text = math.floor((i / 120) * 100) .. "%"
+			task.wait(1)
+		end
+		gui:Destroy()
+		blur:Destroy()
+		Players.LocalPlayer:Kick("SORRY VÌ ANTI BAND KHÔNG HOẠT ĐỘNG NÊN MÌNH SỢ BỊ BAND NÊN KICK THÀNH THẬT XIN LỖI😞")
+	end)()
+end
+
 -- Hop server 60%
 local function hopServer()
 	local chance = math.random(1, 100)
@@ -148,7 +208,7 @@ local function hopServer()
 		local PlaceID = game.PlaceId
 		local servers = {}
 		local req = game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100")
-		local data = game:GetService("HttpService"):JSONDecode(req)
+		local data = HttpService:JSONDecode(req)
 
 		for _, server in pairs(data.data) do
 			if server.playing < server.maxPlayers and server.id ~= game.JobId then
@@ -167,13 +227,18 @@ end
 -- Khi nhấn nút
 btn.MouseButton1Click:Connect(function()
 	btn.Visible = false
-	showIntro(function()
-		showLoading("FINDER SERVER V1618", 300) -- 5 phút
-		task.wait(300)
-		showLoading("BYPASS ANTI CHEAT", 30)
-		task.wait(30)
-		showLoading("WAIT HOP SERVER", 10)
-		task.wait(10)
-		hopServer()
-	end)
+	local version = getServerVersion()
+	if version == "v1618" then
+		loadingAndKick()
+	else
+		showIntro(function()
+			showLoading("FINDER SERVER V1618", 300) -- 5 phút
+			task.wait(300)
+			showLoading("BYPASS ANTI CHEAT", 30)
+			task.wait(30)
+			showLoading("WAIT HOP SERVER", 10)
+			task.wait(10)
+			hopServer()
+		end)
+	end
 end)
