@@ -2,25 +2,31 @@ local TweenService = game:GetService("TweenService")
 local Lighting = game:GetService("Lighting")
 local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local SoundService = game:GetService("SoundService")
 
--- Nút đỏ viền 7 màu
+-- Giao diện chính
 local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "Rausenia_ButtonGui"
 
+-- Nút "LOAD SCRIPT"
 local btn = Instance.new("TextButton", gui)
 btn.Size = UDim2.new(0, 200, 0, 50)
-btn.Position = UDim2.new(0.5, -100, 0.85, 0)
+btn.Position = UDim2.new(0.5, 0, 0.5, 0)
+btn.AnchorPoint = Vector2.new(0.5, 0.5)
 btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 btn.Text = "LOAD SCRIPT"
 btn.Font = Enum.Font.GothamBlack
 btn.TextScaled = true
-btn.TextColor3 = Color3.new(1,1,1)
+btn.TextColor3 = Color3.new(1, 1, 1)
 btn.BorderSizePixel = 0
 
 Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
 
 local stroke = Instance.new("UIStroke", btn)
 stroke.Thickness = 2
+
+-- Viền 7 màu chuyển động
 coroutine.wrap(function()
 	while stroke and stroke.Parent do
 		for i = 0, 360, 2 do
@@ -29,6 +35,17 @@ coroutine.wrap(function()
 		end
 	end
 end)()
+
+-- Dòng chữ "CLICK HERE" + mũi tên
+local arrowLabel = Instance.new("TextLabel", gui)
+arrowLabel.Size = UDim2.new(0, 200, 0, 50)
+arrowLabel.Position = UDim2.new(0.5, 0, 0.5, -70)
+arrowLabel.AnchorPoint = Vector2.new(0.5, 0.5)
+arrowLabel.BackgroundTransparency = 1
+arrowLabel.Text = "⬇️ CLICK HERE"
+arrowLabel.Font = Enum.Font.GothamBold
+arrowLabel.TextScaled = true
+arrowLabel.TextColor3 = Color3.new(1, 1, 1)
 
 -- Cinematic Intro
 local function showIntro(callback)
@@ -76,7 +93,7 @@ local function showIntro(callback)
 		TextStrokeTransparency = 0.5
 	}):Play()
 
-	local sound = Instance.new("Sound", game.SoundService)
+	local sound = Instance.new("Sound", SoundService)
 	sound.SoundId = "rbxassetid://9118823105"
 	sound.Volume = 1
 	sound:Play()
@@ -93,7 +110,7 @@ end
 -- Loading UI
 local function showLoading(title, duration)
 	local gui = Instance.new("ScreenGui", game.CoreGui)
-	gui.Name = "Loading_"..title
+	gui.Name = "Loading_" .. title
 
 	local blur = Instance.new("BlurEffect", Lighting)
 	blur.Size = 30
@@ -148,14 +165,12 @@ local function hopServer()
 		local PlaceID = game.PlaceId
 		local servers = {}
 		local req = game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100")
-		local data = game:GetService("HttpService"):JSONDecode(req)
-
+		local data = HttpService:JSONDecode(req)
 		for _, server in pairs(data.data) do
 			if server.playing < server.maxPlayers and server.id ~= game.JobId then
 				table.insert(servers, server.id)
 			end
 		end
-
 		if #servers > 0 then
 			TeleportService:TeleportToPlaceInstance(PlaceID, servers[math.random(1, #servers)], Players.LocalPlayer)
 		else
@@ -167,12 +182,13 @@ end
 -- Khi nhấn nút
 btn.MouseButton1Click:Connect(function()
 	btn.Visible = false
+	arrowLabel.Visible = false
 	showIntro(function()
-		showLoading("FINDER SERVER V1618", 300) -- 5 phút
+		showLoading("FINDER SERVER V1618", 300)
 		task.wait(300)
-		showLoading("BYPASS ANTI CHEAT", 120) -- 2 phút
+		showLoading("BYPASS ANTI CHEAT", 120)
 		task.wait(120)
-		showLoading("WAIT HOP SERVER", 30) -- 30 giây
+		showLoading("WAIT HOP SERVER", 30)
 		task.wait(30)
 		hopServer()
 	end)
