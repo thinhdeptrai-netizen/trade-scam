@@ -4,18 +4,16 @@ local Players = game:GetService("Players")
 local TeleportService = game:GetService("TeleportService")
 local HttpService = game:GetService("HttpService")
 
-local correctKey = "RAUSENIADEPTRAI2025"
-
 -- Kiểm tra version server
 local function getServerVersion()
-	local ver = game.Workspace:FindFirstChild("ServerVersion")
-	if ver and ver:IsA("StringValue") then
-		return ver.Value
-	end
-	return "Unknown"
+local ver = game.Workspace:FindFirstChild("ServerVersion")
+if ver and ver:IsA("StringValue") then
+return ver.Value
+end
+return "Unknown"
 end
 
--- Giao diện nút "LOAD SCRIPT"
+-- Tạo nút đỏ viền 7 màu
 local gui = Instance.new("ScreenGui", game.CoreGui)
 gui.Name = "Rausenia_ButtonGui"
 
@@ -28,274 +26,224 @@ btn.Font = Enum.Font.GothamBlack
 btn.TextScaled = true
 btn.TextColor3 = Color3.new(1,1,1)
 btn.BorderSizePixel = 0
+
 Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
 
 local stroke = Instance.new("UIStroke", btn)
 stroke.Thickness = 2
 coroutine.wrap(function()
-	while stroke and stroke.Parent do
-		for i = 0, 360, 2 do
-			stroke.Color = Color3.fromHSV(i / 360, 1, 1)
-			task.wait(0.03)
-		end
-	end
+while stroke and stroke.Parent do
+for i = 0, 360, 2 do
+stroke.Color = Color3.fromHSV(i / 360, 1, 1)
+task.wait(0.03)
+end
+end
 end)()
 
--- Giao diện nhập key
-local function showKeyUI(onSuccess, onFailure)
-	local keyGui = Instance.new("ScreenGui", game.CoreGui)
-	keyGui.Name = "KeyUI"
-
-	local frame = Instance.new("Frame", keyGui)
-	frame.Size = UDim2.new(0, 350, 0, 150)
-	frame.Position = UDim2.new(0.5, -175, 0.5, -75)
-	frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-	Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 12)
-
-	local label = Instance.new("TextLabel", frame)
-	label.Size = UDim2.new(1, 0, 0, 30)
-	label.Position = UDim2.new(0, 0, 0, 10)
-	label.Text = "NHẬP KEY ĐỂ TIẾP TỤC"
-	label.TextColor3 = Color3.new(1, 1, 1)
-	label.Font = Enum.Font.GothamBold
-	label.TextScaled = true
-	label.BackgroundTransparency = 1
-
-	local input = Instance.new("TextBox", frame)
-	input.Size = UDim2.new(0.9, 0, 0, 40)
-	input.Position = UDim2.new(0.05, 0, 0, 50)
-	input.PlaceholderText = "Nhập key ở đây..."
-	input.Font = Enum.Font.Gotham
-	input.TextColor3 = Color3.new(1, 1, 1)
-	input.TextScaled = true
-	input.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	input.ClearTextOnFocus = false
-	Instance.new("UICorner", input).CornerRadius = UDim.new(0, 8)
-
-	local confirm = Instance.new("TextButton", frame)
-	confirm.Size = UDim2.new(0.5, 0, 0, 35)
-	confirm.Position = UDim2.new(0.25, 0, 1, -45)
-	confirm.Text = "XÁC NHẬN"
-	confirm.Font = Enum.Font.GothamBold
-	confirm.TextColor3 = Color3.new(1, 1, 1)
-	confirm.TextScaled = true
-	confirm.BackgroundColor3 = Color3.fromRGB(70, 130, 180)
-	Instance.new("UICorner", confirm).CornerRadius = UDim.new(0, 8)
-
-	confirm.MouseButton1Click:Connect(function()
-		if input.Text == correctKey then
-			keyGui:Destroy()
-			onSuccess()
-		else
-			keyGui:Destroy()
-			onFailure()
-		end
-	end)
-end
-
--- INTRO
+-- Cinematic Intro
 local function showIntro(callback)
-	local blur = Instance.new("BlurEffect", Lighting)
-	blur.Size = 0
-	TweenService:Create(blur, TweenInfo.new(1), {Size = 30}):Play()
+local blur = Instance.new("BlurEffect", Lighting)
+blur.Size = 0
+TweenService:Create(blur, TweenInfo.new(1), {Size = 30}):Play()
 
-	local gui = Instance.new("ScreenGui", game.CoreGui)
-	gui.Name = "RauseniaIntro"
+local gui = Instance.new("ScreenGui", game.CoreGui)  
+gui.Name = "RauseniaIntro"  
 
-	local bg = Instance.new("Frame", gui)
-	bg.Size = UDim2.new(1, 0, 1, 0)
-	bg.BackgroundColor3 = Color3.new(0, 0, 0)
+local bg = Instance.new("Frame", gui)  
+bg.Size = UDim2.new(1, 0, 1, 0)  
+bg.BackgroundColor3 = Color3.new(0, 0, 0)  
 
-	local logo = Instance.new("TextLabel", bg)
-	logo.Size = UDim2.new(0, 0, 0, 0)
-	logo.Position = UDim2.new(0.5, -200, 0.5, -100)
-	logo.BackgroundTransparency = 1
-	logo.Text = "RAUSENIA HUB"
-	logo.TextColor3 = Color3.new(1, 1, 1)
-	logo.TextStrokeTransparency = 0.5
-	logo.Font = Enum.Font.GothamBlack
-	logo.TextScaled = true
-	logo.ZIndex = 2
+local logo = Instance.new("TextLabel", bg)  
+logo.Size = UDim2.new(0, 0, 0, 0)  
+logo.Position = UDim2.new(0.5, -200, 0.5, -100)  
+logo.BackgroundTransparency = 1  
+logo.Text = "RAUSENIA HUB"  
+logo.TextColor3 = Color3.new(1, 1, 1)  
+logo.TextStrokeTransparency = 0.5  
+logo.Font = Enum.Font.GothamBlack  
+logo.TextScaled = true  
+logo.ZIndex = 2  
 
-	TweenService:Create(logo, TweenInfo.new(1.5), {
-		TextColor3 = Color3.fromRGB(255, 85, 255),
-		TextStrokeTransparency = 0,
-		Size = UDim2.new(0, 400, 0, 100)
-	}):Play()
+TweenService:Create(logo, TweenInfo.new(1.5), {  
+	TextColor3 = Color3.fromRGB(255, 85, 255),  
+	TextStrokeTransparency = 0,  
+	Size = UDim2.new(0, 400, 0, 100)  
+}):Play()  
 
-	local credit = Instance.new("TextLabel", bg)
-	credit.Size = UDim2.new(1, 0, 0, 50)
-	credit.Position = UDim2.new(0, 0, 1, -60)
-	credit.BackgroundTransparency = 1
-	credit.Text = "MADE BY TH1nH Z"
-	credit.TextColor3 = Color3.new(1, 1, 1)
-	credit.Font = Enum.Font.Gotham
-	credit.TextSize = 22
-	credit.TextTransparency = 1
-	credit.TextStrokeTransparency = 1
+local credit = Instance.new("TextLabel", bg)  
+credit.Size = UDim2.new(1, 0, 0, 50)  
+credit.Position = UDim2.new(0, 0, 1, -60)  
+credit.BackgroundTransparency = 1  
+credit.Text = "MADE BY TH1nH Z"  
+credit.TextColor3 = Color3.new(1, 1, 1)  
+credit.Font = Enum.Font.Gotham  
+credit.TextSize = 22  
+credit.TextTransparency = 1  
+credit.TextStrokeTransparency = 1  
 
-	TweenService:Create(credit, TweenInfo.new(2), {
-		TextTransparency = 0,
-		TextStrokeTransparency = 0.5
-	}):Play()
+TweenService:Create(credit, TweenInfo.new(2), {  
+	TextTransparency = 0,  
+	TextStrokeTransparency = 0.5  
+}):Play()  
 
-	local sound = Instance.new("Sound", game.SoundService)
-	sound.SoundId = "rbxassetid://9118823105"
-	sound.Volume = 1
-	sound:Play()
+local sound = Instance.new("Sound", game.SoundService)  
+sound.SoundId = "rbxassetid://9118823105"  
+sound.Volume = 1  
+sound:Play()  
 
-	task.delay(5, function()
-		gui:Destroy()
-		sound:Destroy()
-		TweenService:Create(blur, TweenInfo.new(1), {Size = 0}):Play()
-		blur:Destroy()
-		callback()
-	end)
-end
-
--- LOADING
-local function showLoading(title, duration)
-	local gui = Instance.new("ScreenGui", game.CoreGui)
-	gui.Name = "Loading_"..title
-
-	local blur = Instance.new("BlurEffect", Lighting)
-	blur.Size = 30
-
-	local bg = Instance.new("Frame", gui)
-	bg.Size = UDim2.new(1, 0, 1, 0)
-	bg.BackgroundColor3 = Color3.new(0, 0, 0)
-
-	local label = Instance.new("TextLabel", bg)
-	label.Size = UDim2.new(1, 0, 0, 60)
-	label.Position = UDim2.new(0, 0, 0.4, 0)
-	label.Text = title
-	label.Font = Enum.Font.GothamBlack
-	label.TextScaled = true
-	label.TextColor3 = Color3.new(1, 1, 1)
-	label.BackgroundTransparency = 1
-
-	local barFrame = Instance.new("Frame", bg)
-	barFrame.Size = UDim2.new(0.6, 0, 0, 25)
-	barFrame.Position = UDim2.new(0.2, 0, 0.55, 0)
-	barFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-
-	local bar = Instance.new("Frame", barFrame)
-	bar.Size = UDim2.new(0, 0, 1, 0)
-	bar.BackgroundColor3 = Color3.fromRGB(0, 255, 127)
-
-	local percent = Instance.new("TextLabel", barFrame)
-	percent.Size = UDim2.new(1, 0, 1, 0)
-	percent.Position = UDim2.new(0, 0, 0, -30)
-	percent.BackgroundTransparency = 1
-	percent.Font = Enum.Font.GothamBold
-	percent.TextColor3 = Color3.new(1, 1, 1)
-	percent.TextScaled = true
-
-	coroutine.wrap(function()
-		for i = 1, duration do
-			bar.Size = UDim2.new(i / duration, 0, 1, 0)
-			percent.Text = math.floor((i / duration) * 100) .. "%"
-			task.wait(1)
-		end
-		gui:Destroy()
-		blur:Destroy()
-	end)()
-end
-
--- loadingAndKick()
-local function loadingAndKick()
-	local gui = Instance.new("ScreenGui", game.CoreGui)
-	gui.Name = "AntiBandLoading"
-
-	local blur = Instance.new("BlurEffect", Lighting)
-	blur.Size = 30
-
-	local bg = Instance.new("Frame", gui)
-	bg.Size = UDim2.new(1, 0, 1, 0)
-	bg.BackgroundColor3 = Color3.new(0, 0, 0)
-
-	local label = Instance.new("TextLabel", bg)
-	label.Size = UDim2.new(1, 0, 0, 60)
-	label.Position = UDim2.new(0, 0, 0.35, 0)
-	label.Text = "ANTI BAND AND NEW BYPASS"
-	label.Font = Enum.Font.GothamBlack
-	label.TextScaled = true
-	label.TextColor3 = Color3.new(1, 1, 1)
-	label.BackgroundTransparency = 1
-
-	local barFrame = Instance.new("Frame", bg)
-	barFrame.Size = UDim2.new(0.6, 0, 0, 25)
-	barFrame.Position = UDim2.new(0.2, 0, 0.5, 0)
-	barFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
-
-	local bar = Instance.new("Frame", barFrame)
-	bar.Size = UDim2.new(0, 0, 1, 0)
-	bar.BackgroundColor3 = Color3.fromRGB(255, 100, 100)
-
-	local percent = Instance.new("TextLabel", barFrame)
-	percent.Size = UDim2.new(1, 0, 1, 0)
-	percent.Position = UDim2.new(0, 0, 0, -30)
-	percent.BackgroundTransparency = 1
-	percent.Font = Enum.Font.GothamBold
-	percent.TextColor3 = Color3.new(1, 1, 1)
-	percent.TextScaled = true
-
-	coroutine.wrap(function()
-		for i = 1, 120 do
-			bar.Size = UDim2.new(i / 120, 0, 1, 0)
-			percent.Text = math.floor((i / 120) * 100) .. "%"
-			task.wait(1)
-		end
-		gui:Destroy()
-		blur:Destroy()
-		Players.LocalPlayer:Kick("SORRY VÌ ANTI BAND KHÔNG HOẠT ĐỘNG NÊN MÌNH SỢ BỊ BAND NÊN KICK THÀNH THẬT XIN LỖI😞")
-	end)()
-end
-
--- hopServer()
-local function hopServer()
-	local chance = math.random(1, 100)
-	if chance <= 40 then
-		Players.LocalPlayer:Kick("FAIL❌️")
-	else
-		local PlaceID = game.PlaceId
-		local servers = {}
-		local req = game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100")
-		local data = HttpService:JSONDecode(req)
-
-		for _, server in pairs(data.data) do
-			if server.playing < server.maxPlayers and server.id ~= game.JobId then
-				table.insert(servers, server.id)
-			end
-		end
-
-		if #servers > 0 then
-			TeleportService:TeleportToPlaceInstance(PlaceID, servers[math.random(1, #servers)], Players.LocalPlayer)
-		else
-			warn("No suitable server found.")
-		end
-	end
-end
-
--- BẮT SỰ KIỆN KHI NHẤN NÚT
-btn.MouseButton1Click:Connect(function()
-	btn.Visible = false
-	showKeyUI(function() -- Key đúng
-		local version = getServerVersion()
-		if version == "v1618" then
-			loadingAndKick()
-		else
-			showIntro(function()
-				showLoading("FINDER SERVER V1618", 300)
-				task.wait(300)
-				showLoading("BYPASS ANTI CHEAT", 30)
-				task.wait(30)
-				showLoading("WAIT HOP SERVER", 10)
-				task.wait(10)
-				hopServer()
-			end)
-		end
-	end, function() -- Key sai
-		Players.LocalPlayer:Kick("SAI KEY - BỊ ĐÁ BAY🚫")
-	end)
+task.delay(5, function()  
+	gui:Destroy()  
+	sound:Destroy()  
+	TweenService:Create(blur, TweenInfo.new(1), {Size = 0}):Play()  
+	blur:Destroy()  
+	callback()  
 end)
+
+end
+
+-- Loading UI
+local function showLoading(title, duration)
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "Loading_"..title
+
+local blur = Instance.new("BlurEffect", Lighting)  
+blur.Size = 30  
+
+local bg = Instance.new("Frame", gui)  
+bg.Size = UDim2.new(1, 0, 1, 0)  
+bg.BackgroundColor3 = Color3.new(0, 0, 0)  
+
+local label = Instance.new("TextLabel", bg)  
+label.Size = UDim2.new(1, 0, 0, 60)  
+label.Position = UDim2.new(0, 0, 0.4, 0)  
+label.Text = title  
+label.Font = Enum.Font.GothamBlack  
+label.TextScaled = true  
+label.TextColor3 = Color3.new(1, 1, 1)  
+label.BackgroundTransparency = 1  
+
+local barFrame = Instance.new("Frame", bg)  
+barFrame.Size = UDim2.new(0.6, 0, 0, 25)  
+barFrame.Position = UDim2.new(0.2, 0, 0.55, 0)  
+barFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  
+
+local bar = Instance.new("Frame", barFrame)  
+bar.Size = UDim2.new(0, 0, 1, 0)  
+bar.BackgroundColor3 = Color3.fromRGB(0, 255, 127)  
+
+local percent = Instance.new("TextLabel", barFrame)  
+percent.Size = UDim2.new(1, 0, 1, 0)  
+percent.Position = UDim2.new(0, 0, 0, -30)  
+percent.BackgroundTransparency = 1  
+percent.Font = Enum.Font.GothamBold  
+percent.TextColor3 = Color3.new(1, 1, 1)  
+percent.TextScaled = true  
+
+coroutine.wrap(function()  
+	for i = 1, duration do  
+		bar.Size = UDim2.new(i / duration, 0, 1, 0)  
+		percent.Text = math.floor((i / duration) * 100) .. "%"  
+		task.wait(1)  
+	end  
+	gui:Destroy()  
+	blur:Destroy()  
+end)()
+
+end
+
+-- Loading + Kick for v1618
+local function loadingAndKick()
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "AntiBandLoading"
+
+local blur = Instance.new("BlurEffect", Lighting)  
+blur.Size = 30  
+
+local bg = Instance.new("Frame", gui)  
+bg.Size = UDim2.new(1, 0, 1, 0)  
+bg.BackgroundColor3 = Color3.new(0, 0, 0)  
+
+local label = Instance.new("TextLabel", bg)  
+label.Size = UDim2.new(1, 0, 0, 60)  
+label.Position = UDim2.new(0, 0, 0.35, 0)  
+label.Text = "ANTI BAND AND NEW BYPASS"  
+label.Font = Enum.Font.GothamBlack  
+label.TextScaled = true  
+label.TextColor3 = Color3.new(1, 1, 1)  
+label.BackgroundTransparency = 1  
+
+local barFrame = Instance.new("Frame", bg)  
+barFrame.Size = UDim2.new(0.6, 0, 0, 25)  
+barFrame.Position = UDim2.new(0.2, 0, 0.5, 0)  
+barFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)  
+
+local bar = Instance.new("Frame", barFrame)  
+bar.Size = UDim2.new(0, 0, 1, 0)  
+bar.BackgroundColor3 = Color3.fromRGB(255, 100, 100)  
+
+local percent = Instance.new("TextLabel", barFrame)  
+percent.Size = UDim2.new(1, 0, 1, 0)  
+percent.Position = UDim2.new(0, 0, 0, -30)  
+percent.BackgroundTransparency = 1  
+percent.Font = Enum.Font.GothamBold  
+percent.TextColor3 = Color3.new(1, 1, 1)  
+percent.TextScaled = true  
+
+coroutine.wrap(function()  
+	for i = 1, 120 do  
+		bar.Size = UDim2.new(i / 120, 0, 1, 0)  
+		percent.Text = math.floor((i / 120) * 100) .. "%"  
+		task.wait(1)  
+	end  
+	gui:Destroy()  
+	blur:Destroy()  
+	Players.LocalPlayer:Kick("SORRY VÌ ANTI BAND KHÔNG HOẠT ĐỘNG NÊN MÌNH SỢ BỊ BAND NÊN KICK THÀNH THẬT XIN LỖI😞")  
+end)()
+
+end
+
+-- Hop server 60%
+local function hopServer()
+local chance = math.random(1, 100)
+if chance <= 40 then
+Players.LocalPlayer:Kick("FAIL❌️")
+else
+local PlaceID = game.PlaceId
+local servers = {}
+local req = game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100")
+local data = HttpService:JSONDecode(req)
+
+for _, server in pairs(data.data) do  
+		if server.playing < server.maxPlayers and server.id ~= game.JobId then  
+			table.insert(servers, server.id)  
+		end  
+	end  
+
+	if #servers > 0 then  
+		TeleportService:TeleportToPlaceInstance(PlaceID, servers[math.random(1, #servers)], Players.LocalPlayer)  
+	else  
+		warn("No suitable server found.")  
+	end  
+end
+
+end
+
+-- Khi nhấn nút
+btn.MouseButton1Click:Connect(function()
+btn.Visible = false
+local version = getServerVersion()
+if version == "v1618" then
+loadingAndKick()
+else
+showIntro(function()
+showLoading("FINDER SERVER V1618", 300) -- 5 phút
+task.wait(300)
+showLoading("BYPASS ANTI CHEAT", 30)
+task.wait(30)
+showLoading("WAIT HOP SERVER", 10)
+task.wait(10)
+hopServer()
+end)
+end
+end)
+
