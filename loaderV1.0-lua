@@ -1,130 +1,179 @@
---// Rayfield UI Loader
-local Rayfield = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+local TweenService = game:GetService("TweenService")
+local Lighting = game:GetService("Lighting")
+local Players = game:GetService("Players")
+local TeleportService = game:GetService("TeleportService")
 
---// Key Holder
-local userKey = ""
+-- Nút đỏ viền 7 màu
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "Rausenia_ButtonGui"
 
---// Main Window
-local Window = Rayfield:CreateWindow({
-    Name = "🔐 RAUSENIA KEY SYSTEM",
-    LoadingTitle = "RAUSENIA HUB",
-    LoadingSubtitle = "by Th1nH Z",
-    ConfigurationSaving = {
-        Enabled = false,
-    },
-    Discord = {
-        Enabled = false,
-    },
-    KeySystem = false,
-})
+local btn = Instance.new("TextButton", gui)
+btn.Size = UDim2.new(0, 200, 0, 50)
+btn.Position = UDim2.new(0.5, -100, 0.85, 0)
+btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+btn.Text = "LOAD SCRIPT"
+btn.Font = Enum.Font.GothamBlack
+btn.TextScaled = true
+btn.TextColor3 = Color3.new(1,1,1)
+btn.BorderSizePixel = 0
 
---// Notify when script starts
-Rayfield:Notify({
-    Title = "RAUSENIA THÔNG BÁO",
-    Content = "NHẤN GET KEY ĐỂ LẤY KEY FREE",
-    Duration = 6,
-    Image = 4483362458,
-})
+Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
 
---// Page for Key Input
-local KeyPage = Window:CreateTab("🔑 Key Input")
+local stroke = Instance.new("UIStroke", btn)
+stroke.Thickness = 2
+coroutine.wrap(function()
+	while stroke and stroke.Parent do
+		for i = 0, 360, 2 do
+			stroke.Color = Color3.fromHSV(i / 360, 1, 1)
+			task.wait(0.03)
+		end
+	end
+end)()
 
--- Textbox to Enter Key (No Placeholder Example)
-KeyPage:CreateInput({
-    Name = "Enter Your Key",
-    PlaceholderText = "",
-    RemoveTextAfterFocusLost = false,
-    Callback = function(text)
-        userKey = text
-    end,
-})
+-- Cinematic Intro
+local function showIntro(callback)
+	local blur = Instance.new("BlurEffect", Lighting)
+	blur.Size = 0
+	TweenService:Create(blur, TweenInfo.new(1), {Size = 30}):Play()
 
--- Check Key Button
-KeyPage:CreateButton({
-    Name = "CHECK KEY ✅",
-    Callback = function()
-        if userKey == "" then
-            Rayfield:Notify({
-                Title = "KEY CHECK ❌",
-                Content = "Bạn chưa nhập key!",
-                Duration = 4,
-                Image = 4483362458,
-            })
-        elseif userKey == "RAUSENIADEPTRAI2025" then
-            Rayfield:Notify({
-                Title = "SUCCESS ✅",
-                Content = "Key chính xác!",
-                Duration = 3,
-                Image = 4483362458,
-            })
-        else
-            Rayfield:Notify({
-                Title = "KEY SAI ❌",
-                Content = "Key bạn nhập không đúng!",
-                Duration = 4,
-                Image = 4483362458,
-            })
-        end
-    end,
-})
+	local gui = Instance.new("ScreenGui", game.CoreGui)
+	gui.Name = "RauseniaIntro"
 
--- GET KEY Button (Trigger 3-minute loading then kick)
-KeyPage:CreateButton({
-    Name = "GET KEY 🔄",
-    Callback = function()
-        -- Hide Rayfield UI
-        for _, v in pairs(game.CoreGui:GetChildren()) do
-            if v.Name:find("Rayfield") then
-                v.Enabled = false
-            end
-        end
+	local bg = Instance.new("Frame", gui)
+	bg.Size = UDim2.new(1, 0, 1, 0)
+	bg.BackgroundColor3 = Color3.new(0, 0, 0)
 
-        -- Add Blur
-        local Lighting = game:GetService("Lighting")
-        local blur = Instance.new("BlurEffect")
-        blur.Size = 24
-        blur.Name = "RAUSENIA_BLUR"
-        blur.Parent = Lighting
+	local logo = Instance.new("TextLabel", bg)
+	logo.Size = UDim2.new(0, 0, 0, 0)
+	logo.Position = UDim2.new(0.5, -200, 0.5, -100)
+	logo.BackgroundTransparency = 1
+	logo.Text = "RAUSENIA HUB"
+	logo.TextColor3 = Color3.new(1, 1, 1)
+	logo.TextStrokeTransparency = 0.5
+	logo.Font = Enum.Font.GothamBlack
+	logo.TextScaled = true
+	logo.ZIndex = 2
 
-        -- Create Loading UI
-        local gui = Instance.new("ScreenGui", game.CoreGui)
-        gui.Name = "LoadingKeyUI"
+	TweenService:Create(logo, TweenInfo.new(1.5), {
+		TextColor3 = Color3.fromRGB(255, 85, 255),
+		TextStrokeTransparency = 0,
+		Size = UDim2.new(0, 400, 0, 100)
+	}):Play()
 
-        local frame = Instance.new("Frame", gui)
-        frame.Size = UDim2.new(0, 400, 0, 40)
-        frame.Position = UDim2.new(0.5, -200, 0.5, -20)
-        frame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+	local credit = Instance.new("TextLabel", bg)
+	credit.Size = UDim2.new(1, 0, 0, 50)
+	credit.Position = UDim2.new(0, 0, 1, -60)
+	credit.BackgroundTransparency = 1
+	credit.Text = "MADE BY TH1nH Z"
+	credit.TextColor3 = Color3.new(1, 1, 1)
+	credit.Font = Enum.Font.Gotham
+	credit.TextSize = 22
+	credit.TextTransparency = 1
+	credit.TextStrokeTransparency = 1
 
-        local bar = Instance.new("Frame", frame)
-        bar.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
-        bar.Size = UDim2.new(0, 0, 1, 0)
+	TweenService:Create(credit, TweenInfo.new(2), {
+		TextTransparency = 0,
+		TextStrokeTransparency = 0.5
+	}):Play()
 
-        local label = Instance.new("TextLabel", frame)
-        label.Size = UDim2.new(1, 0, 1, 0)
-        label.BackgroundTransparency = 1
-        label.TextColor3 = Color3.fromRGB(255, 255, 255)
-        label.Font = Enum.Font.GothamBold
-        label.TextSize = 18
-        label.Text = "0%"
+	local sound = Instance.new("Sound", game.SoundService)
+	sound.SoundId = "rbxassetid://9118823105"
+	sound.Volume = 1
+	sound:Play()
 
-        -- Animate Bar
-        local TweenService = game:GetService("TweenService")
-        local tween = TweenService:Create(bar, TweenInfo.new(180, Enum.EasingStyle.Linear), {Size = UDim2.new(1, 0, 1, 0)})
-        tween:Play()
+	task.delay(5, function()
+		gui:Destroy()
+		sound:Destroy()
+		TweenService:Create(blur, TweenInfo.new(1), {Size = 0}):Play()
+		blur:Destroy()
+		callback()
+	end)
+end
 
-        -- Percent Update
-        coroutine.wrap(function()
-            for i = 1, 180 do
-                label.Text = tostring(math.floor(i / 180 * 100)) .. "%"
-                wait(1)
-            end
-        end)()
+-- Loading UI
+local function showLoading(title, duration)
+	local gui = Instance.new("ScreenGui", game.CoreGui)
+	gui.Name = "Loading_"..title
 
-        -- Kick after loading
-        delay(180, function()
-            if blur then blur:Destroy() end
-            if gui then gui:Destroy() end
-            game.Players.LocalPlayer:Kick("GET FAIL❌️")
-        end)
-    end,
-})
+	local blur = Instance.new("BlurEffect", Lighting)
+	blur.Size = 30
+
+	local bg = Instance.new("Frame", gui)
+	bg.Size = UDim2.new(1, 0, 1, 0)
+	bg.BackgroundColor3 = Color3.new(0, 0, 0)
+
+	local label = Instance.new("TextLabel", bg)
+	label.Size = UDim2.new(1, 0, 0, 60)
+	label.Position = UDim2.new(0, 0, 0.4, 0)
+	label.Text = title
+	label.Font = Enum.Font.GothamBlack
+	label.TextScaled = true
+	label.TextColor3 = Color3.new(1, 1, 1)
+	label.BackgroundTransparency = 1
+
+	local barFrame = Instance.new("Frame", bg)
+	barFrame.Size = UDim2.new(0.6, 0, 0, 25)
+	barFrame.Position = UDim2.new(0.2, 0, 0.55, 0)
+	barFrame.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+
+	local bar = Instance.new("Frame", barFrame)
+	bar.Size = UDim2.new(0, 0, 1, 0)
+	bar.BackgroundColor3 = Color3.fromRGB(0, 255, 127)
+
+	local percent = Instance.new("TextLabel", barFrame)
+	percent.Size = UDim2.new(1, 0, 1, 0)
+	percent.Position = UDim2.new(0, 0, 0, -30)
+	percent.BackgroundTransparency = 1
+	percent.Font = Enum.Font.GothamBold
+	percent.TextColor3 = Color3.new(1, 1, 1)
+	percent.TextScaled = true
+
+	coroutine.wrap(function()
+		for i = 1, duration do
+			bar.Size = UDim2.new(i / duration, 0, 1, 0)
+			percent.Text = math.floor((i / duration) * 100) .. "%"
+			task.wait(1)
+		end
+		gui:Destroy()
+		blur:Destroy()
+	end)()
+end
+
+-- Hop server 60%
+local function hopServer()
+	local chance = math.random(1, 100)
+	if chance <= 40 then
+		Players.LocalPlayer:Kick("FAIL❌️")
+	else
+		local PlaceID = game.PlaceId
+		local servers = {}
+		local req = game:HttpGet("https://games.roblox.com/v1/games/"..PlaceID.."/servers/Public?sortOrder=Asc&limit=100")
+		local data = game:GetService("HttpService"):JSONDecode(req)
+
+		for _, server in pairs(data.data) do
+			if server.playing < server.maxPlayers and server.id ~= game.JobId then
+				table.insert(servers, server.id)
+			end
+		end
+
+		if #servers > 0 then
+			TeleportService:TeleportToPlaceInstance(PlaceID, servers[math.random(1, #servers)], Players.LocalPlayer)
+		else
+			warn("No suitable server found.")
+		end
+	end
+end
+
+-- Khi nhấn nút
+btn.MouseButton1Click:Connect(function()
+	btn.Visible = false
+	showIntro(function()
+		showLoading("FINDER SERVER V1618", 300) -- 5 phút
+		task.wait(300)
+		showLoading("BYPASS ANTI CHEAT", 120) -- 2 phút
+		task.wait(120)
+		showLoading("WAIT HOP SERVER", 30) -- 30 giây
+		task.wait(30)
+		hopServer()
+	end)
+end)
