@@ -184,7 +184,7 @@ btn.MouseButton1Click:Connect(function()
 	btn.Visible = false
 	arrowLabel.Visible = false
 	showIntro(function()
-		showLoading("FINDER SERVER V1618", 300)
+		showLoading("Anti band loading", 300) -- 🔄 Đã đổi tên tại đây
 		task.wait(300)
 		showLoading("BYPASS ANTI CHEAT", 120)
 		task.wait(120)
