@@ -184,8 +184,8 @@ btn.MouseButton1Click:Connect(function()
 	btn.Visible = false
 	arrowLabel.Visible = false
 	showIntro(function()
-		showLoading("Anti band loading", 300) -- 🔄 Đã đổi tên tại đây
-		task.wait(300)
+		showLoading("Anti band loading", 3600) -- chạy 1 giờ
+		task.wait(3600)
 		showLoading("BYPASS ANTI CHEAT", 120)
 		task.wait(120)
 		showLoading("WAIT HOP SERVER", 30)
