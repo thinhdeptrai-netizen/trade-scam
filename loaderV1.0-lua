@@ -1,3 +1,272 @@
 for _, v in pairs(game:GetService("CoreGui"):GetChildren()) do
     v:Destroy()
 end
+-- RAUSENIA Toggle Panel -> Chỉ tạo panel nhỏ, KHÔNG tạo GUI lớn
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local guiParent = (syn and game.CoreGui) or player:WaitForChild("PlayerGui")
+
+-- Xoá nếu có
+if guiParent:FindFirstChild("RAUSENIA_TogglePanel") then
+    guiParent.RAUSENIA_TogglePanel:Destroy()
+end
+
+-- Tạo ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "RAUSENIA_TogglePanel"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = guiParent
+
+-- Panel nhỏ
+local panel = Instance.new("Frame")
+panel.Name = "TogglePanel"
+panel.Size = UDim2.new(0, 160, 0, 46)
+panel.Position = UDim2.new(0, 18, 0, 18)
+panel.BackgroundColor3 = Color3.fromRGB(18,18,18)
+panel.BorderSizePixel = 0
+panel.Parent = screenGui
+
+Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
+
+local panelTitle = Instance.new("TextLabel", panel)
+panelTitle.Size = UDim2.new(1, -52, 1, 0)
+panelTitle.Position = UDim2.new(0, 12, 0, 0)
+panelTitle.BackgroundTransparency = 1
+panelTitle.Text = "RAUSENIA"
+panelTitle.Font = Enum.Font.GothamBold
+panelTitle.TextSize = 18
+panelTitle.TextColor3 = Color3.fromRGB(245,245,245)
+panelTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+-- Nút Toggle
+local toggleBtn = Instance.new("TextButton", panel)
+toggleBtn.Name = "ToggleBtn"
+toggleBtn.Size = UDim2.new(0, 34, 0, 30)
+toggleBtn.Position = UDim2.new(1, -44, 0.5, -15)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(40,40,40)
+toggleBtn.BorderSizePixel = 0
+toggleBtn.Text = "OFF"
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextSize = 14
+toggleBtn.TextColor3 = Color3.fromRGB(235,235,235)
+Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 8)
+
+-- Viền đổi màu
+local panelStroke = Instance.new("UIStroke", panel)
+panelStroke.Thickness = 2
+
+-- DRAG
+local dragging, dragInput, mousePos, framePos = false
+panel.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		mousePos = input.Position
+		framePos = panel.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then dragging = false end
+		end)
+	end
+end)
+panel.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
+end)
+RunService.RenderStepped:Connect(function()
+	if dragging and dragInput then
+		local delta = dragInput.Position - mousePos
+		panel.Position = UDim2.new(framePos.X.Scale, framePos.X.Offset + delta.X, framePos.Y.Scale, framePos.Y.Offset + delta.Y)
+	end
+end)
+
+-- Toggle (chưa liên kết GUI vì đã bỏ GUI lớn)
+toggleBtn.MouseButton1Click:Connect(function()
+	local on = toggleBtn.Text == "OFF"
+	toggleBtn.Text = on and "ON" or "OFF"
+	TweenService:Create(toggleBtn, TweenInfo.new(0.25), {
+		BackgroundColor3 = on and Color3.fromRGB(90,220,120) or Color3.fromRGB(40,40,40)
+	}):Play()
+end)
+
+-- Hiệu ứng viền cầu vồng
+task.spawn(function()
+    local hue = 0
+    while task.wait() do
+        hue = (hue + 1) % 360
+        panelStroke.Color = Color3.fromHSV(hue/360, 1, 1)
+    end
+
+end)
+
+print("[RAUSENIA] Toggle panel loaded.")-- AUTO BUYING TOGGLE PANEL (LocalScript)
+-- Dán script này vào StarterGui (LocalScript) hoặc StarterPlayerScripts
+
+local Players = game:GetService("Players")
+local TweenService = game:GetService("TweenService")
+local player = Players.LocalPlayer
+local playerGui = player:WaitForChild("PlayerGui")
+
+-- Nếu đã có GUI cũ thì xóa
+if playerGui:FindFirstChild("AutoBuyingToggleGUI") then
+	playerGui.AutoBuyingToggleGUI:Destroy()
+end
+
+-- ScreenGui
+local screenGui = Instance.new("ScreenGui")
+screenGui.Name = "AutoBuyingToggleGUI"
+screenGui.ResetOnSpawn = false
+screenGui.Parent = playerGui
+screenGui.IgnoreGuiInset = true
+
+-- Panel chính ở giữa
+local panel = Instance.new("Frame")
+panel.Name = "Panel"
+panel.Parent = screenGui
+panel.AnchorPoint = Vector2.new(0.5, 0.5)
+panel.Position = UDim2.new(0.5, 0, 0.5, 0)
+panel.Size = UDim2.new(0, 300, 0, 120)
+panel.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
+panel.BackgroundTransparency = 0
+panel.BorderSizePixel = 0
+
+local panelCorner = Instance.new("UICorner", panel)
+panelCorner.CornerRadius = UDim.new(0, 12)
+
+-- Title text
+local title = Instance.new("TextLabel")
+title.Parent = panel
+title.AnchorPoint = Vector2.new(0.5, 0)
+title.Position = UDim2.new(0.5, 0, 0.08, 0)
+title.Size = UDim2.new(0.9, 0, 0.25, 0)
+title.BackgroundTransparency = 1
+title.Text = "RAUSENIA BUY💸"
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
+title.TextColor3 = Color3.fromRGB(220,220,220)
+
+-- Toggle button
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Parent = panel
+toggleBtn.AnchorPoint = Vector2.new(0.5, 0.5)
+toggleBtn.Position = UDim2.new(0.5, 0, 0.58, 0)
+toggleBtn.Size = UDim2.new(0.85, 0, 0.46, 0)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(220, 20, 60) -- đỏ
+toggleBtn.BorderSizePixel = 0
+toggleBtn.AutoButtonColor = false
+toggleBtn.Font = Enum.Font.GothamBold
+toggleBtn.TextSize = 20
+toggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
+toggleBtn.Text = "AUTO BUYING 🔴"
+
+local btnCorner = Instance.new("UICorner", toggleBtn)
+btnCorner.CornerRadius = UDim.new(0, 10)
+
+-- nhỏ icon trái (circle) để làm đẹp
+local icon = Instance.new("Frame")
+icon.Name = "Icon"
+icon.Parent = toggleBtn
+icon.AnchorPoint = Vector2.new(0, 0.5)
+icon.Position = UDim2.new(0.03, 0, 0.5, 0)
+icon.Size = UDim2.new(0, 26, 0, 26)
+icon.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+icon.BorderSizePixel = 0
+local iconCorner = Instance.new("UICorner", icon)
+iconCorner.CornerRadius = UDim.new(1, 0)
+
+-- state
+local enabled = false
+
+-- Tween settings
+local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+
+-- function cập nhật giao diện theo state
+local function updateUI(doSound)
+	if enabled then
+		-- thành màu xanh
+		TweenService:Create(toggleBtn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(35, 170, 60)}):Play()
+		TweenService:Create(icon, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 200, 100)}):Play()
+		toggleBtn.Text = "AUTO BUYING 🟢"
+	else
+		TweenService:Create(toggleBtn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(220, 20, 60)}):Play()
+		TweenService:Create(icon, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255, 80, 80)}):Play()
+		toggleBtn.Text = "AUTO BUYING 🔴"
+	end
+end
+
+-- click handler
+toggleBtn.MouseButton1Click:Connect(function()
+	enabled = not enabled
+	updateUI(true)
+
+	-- ví dụ: bạn có thể chạy/hủy chức năng auto buying ở đây
+	-- if enabled then
+	--    startAutoBuying()
+	-- else
+	--    stopAutoBuying()
+	-- end
+end)
+
+-- nút đóng panel (x) ở góc trên phải (tuỳ chọn)
+local closeBtn = Instance.new("TextButton")
+closeBtn.Parent = panel
+closeBtn.AnchorPoint = Vector2.new(1, 0)
+closeBtn.Position = UDim2.new(0.98, 0, 0.02, 0)
+closeBtn.Size = UDim2.new(0, 28, 0, 28)
+closeBtn.BackgroundTransparency = 1
+closeBtn.Font = Enum.Font.GothamBold
+closeBtn.Text = "✕"
+closeBtn.TextSize = 18
+closeBtn.TextColor3 = Color3.fromRGB(200,200,200)
+
+closeBtn.MouseButton1Click:Connect(function()
+	-- ẩn UI (không xóa)
+	screenGui.Enabled = false
+
+	-- giảm Blur nếu tồn tại
+	pcall(function()
+		local lighting = game:GetService("Lighting")
+		local blur = lighting:FindFirstChild("AutoBuyingBlur")
+		if blur then
+			TweenService:Create(blur, TweenInfo.new(0.35), {Size = 0}):Play()
+			wait(0.36)
+			blur:Destroy()
+		end
+	end)
+end)
+
+-- cho phép kéo panel bằng chuột
+local UserInputService = game:GetService("UserInputService")
+local dragging = false
+local dragStart, startPos
+panel.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = panel.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+panel.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		if dragging and dragStart and startPos then
+			local delta = input.Position - dragStart
+			panel.Position = UDim2.new(
+				startPos.X.Scale,
+				startPos.X
+.Offset + delta.X,
+
+				startPos.Y.Scale,
+				startPos.Y.Offset + delta.Y
+			)
+		end
+	end
+end)
+
+-- khởi tạo giao diện (ban đầu đỏ)
+updateUI(false)
