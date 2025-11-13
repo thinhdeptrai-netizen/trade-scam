@@ -1,13 +1,11 @@
-
--- AUTO BUYING TOGGLE PANEL + NÚT 💸 MỞ/ĐÓNG (LocalScript)
+-- AUTO BUYING TOGGLE PANEL + NÚT 💸 MỞ/ĐÓNG + VIỀN RAINBOW (LocalScript)
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
--- Xoá GUI cũ
+-- Xóa GUI cũ
 if playerGui:FindFirstChild("AutoBuyingToggleGUI") then
 	playerGui.AutoBuyingToggleGUI:Destroy()
 end
@@ -19,93 +17,191 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 screenGui.IgnoreGuiInset = true
 
--- Dim (nền mờ)
+-- Nền mờ
 local dim = Instance.new("Frame", screenGui)
 dim.AnchorPoint = Vector2.new(0.5, 0.5)
 dim.Position = UDim2.new(0.5, 0, 0.5, 0)
 dim.Size = UDim2.new(1, 0, 1, 0)
-dim.BackgroundColor3 = Color3.fromRGB(0,0,0)
+dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 dim.BackgroundTransparency = 0.6
 dim.BorderSizePixel = 0
 
--- Panel chính
+-- PANEL CHÍNH (mở rộng để vừa textbox)
 local panel = Instance.new("Frame", screenGui)
 panel.AnchorPoint = Vector2.new(0.5, 0.5)
 panel.Position = UDim2.new(0.5, 0, 0.5, 0)
-panel.Size = UDim2.new(0, 300, 0, 120)
+panel.Size = UDim2.new(0, 320, 0, 270)
 panel.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 panel.BorderSizePixel = 0
 Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
 
+-- 🌈 VIỀN RAINBOW
+local rainbowStroke = Instance.new("UIStroke", panel)
+rainbowStroke.Thickness = 3
+rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+rainbowStroke.Transparency = 0
+
+task.spawn(function()
+	local t = 0
+	while rainbowStroke.Parent do
+		t += 0.02
+		rainbowStroke.Color = Color3.fromHSV(t % 1, 1, 1)
+		task.wait()
+	end
+end)
+
+-- Tiêu đề
 local title = Instance.new("TextLabel", panel)
 title.AnchorPoint = Vector2.new(0.5, 0)
-title.Position = UDim2.new(0.5, 0, 0.08, 0)
-title.Size = UDim2.new(0.9, 0, 0.25, 0)
+title.Position = UDim2.new(0.5, 0, 0.05, 0)
+title.Size = UDim2.new(0.9, 0, 0.15, 0)
 title.BackgroundTransparency = 1
 title.Text = "TOGGLE PANEL"
 title.Font = Enum.Font.GothamBold
 title.TextSize = 18
-title.TextColor3 = Color3.fromRGB(220,220,220)
+title.TextColor3 = Color3.fromRGB(220, 220, 220)
 
--- Nút AUTO BUYING
-local toggleBtn = Instance.new("TextButton", panel)
-toggleBtn.AnchorPoint = Vector2.new(0.5, 0.5)
-toggleBtn.Position = UDim2.new(0.5, 0, 0.58, 0)
-toggleBtn.Size = UDim2.new(0.85, 0, 0.46, 0)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(220, 20, 60)
-toggleBtn.BorderSizePixel = 0
-toggleBtn.Font = Enum.Font.GothamBold
-toggleBtn.TextSize = 20
-toggleBtn.TextColor3 = Color3.fromRGB(255,255,255)
-toggleBtn.Text = "AUTO BUYING 🔴"
-Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(0, 10)
+-- Hàm tạo nút toggle
+local function createToggleButton(parent, text)
+	local btn = Instance.new("TextButton", parent)
+	btn.Size = UDim2.new(0.85, 0, 0, 40)
+	btn.AnchorPoint = Vector2.new(0.5, 0.5)
+	btn.BackgroundColor3 = Color3.fromRGB(220, 20, 60)
+	btn.BorderSizePixel = 0
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 18
+	btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+	btn.Text = text .. " 🔴"
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
 
-local icon = Instance.new("Frame", toggleBtn)
-icon.AnchorPoint = Vector2.new(0, 0.5)
-icon.Position = UDim2.new(0.03, 0, 0.5, 0)
-icon.Size = UDim2.new(0, 26, 0, 26)
-icon.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
-icon.BorderSizePixel = 0
-Instance.new("UICorner", icon).CornerRadius = UDim.new(1, 0)
+	local icon = Instance.new("Frame", btn)
+	icon.AnchorPoint = Vector2.new(0, 0.5)
+	icon.Position = UDim2.new(0.03, 0, 0.5, 0)
+	icon.Size = UDim2.new(0, 24, 0, 24)
+	icon.BackgroundColor3 = Color3.fromRGB(255, 80, 80)
+	icon.BorderSizePixel = 0
+	Instance.new("UICorner", icon).CornerRadius = UDim.new(1, 0)
 
-local enabled = false
-local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+	return btn, icon
+end
 
-local function updateUI()
-	if enabled then
-		TweenService:Create(toggleBtn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(35, 170, 60)}):Play()
-		TweenService:Create(icon, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 200, 100)}):Play()
-		toggleBtn.Text = "AUTO BUYING 🟢"
+-- 3 NÚT CHÍNH
+local autoBtn, autoIcon = createToggleButton(panel, "AUTO BUYING")
+autoBtn.Position = UDim2.new(0.5, 0, 0.35, 0)
+
+local dupBtn, dupIcon = createToggleButton(panel, "Duplicate 👯‍♂️")
+dupBtn.Position = UDim2.new(0.5, 0, 0.55, 0)
+
+local saveBtn, saveIcon = createToggleButton(panel, "Save Data 💾")
+saveBtn.Position = UDim2.new(0.5, 0, 0.75, 0)
+
+-- 🧾 TEXTBOX + NÚT RUN
+local inputBox = Instance.new("TextBox", panel)
+inputBox.AnchorPoint = Vector2.new(0.5, 0.5)
+inputBox.Position = UDim2.new(0.5, 0, 0.88, 0)
+inputBox.Size = UDim2.new(0.6, 0, 0, 32)
+inputBox.PlaceholderText = "Nhập nội dung..."
+inputBox.Font = Enum.Font.Gotham
+inputBox.TextSize = 16
+inputBox.Text = ""
+inputBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
+inputBox.BorderSizePixel = 0
+Instance.new("UICorner", inputBox).CornerRadius = UDim.new(0, 8)
+
+local runBtn = Instance.new("TextButton", panel)
+runBtn.AnchorPoint = Vector2.new(0.5, 0.5)
+runBtn.Position = UDim2.new(0.85, 0, 0.88, 0)
+runBtn.Size = UDim2.new(0, 55, 0, 32)
+runBtn.BackgroundColor3 = Color3.fromRGB(35, 130, 230)
+runBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
+runBtn.Font = Enum.Font.GothamBold
+runBtn.TextSize = 16
+runBtn.Text = "RUN"
+Instance.new("UICorner", runBtn).CornerRadius = UDim.new(0, 8)
+
+-- Khi ấn RUN
+runBtn.MouseButton1Click:Connect(function()
+	if inputBox.Text ~= "" then
+		game.StarterGui:SetCore("SendNotification", {
+			Title = "RAUSENIA 💸";
+			Text = "Đang xử lý: " .. inputBox.Text;
+			Duration = 2.5;
+		})
 	else
-		TweenService:Create(toggleBtn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(220, 20, 60)}):Play()
+		game.StarterGui:SetCore("SendNotification", {
+			Title = "Lỗi ⚠️";
+			Text = "Vui lòng nhập nội dung trước!";
+			Duration = 2;
+		})
+	end
+end)
+
+-- Toggle hiệu ứng
+local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
+local function toggle(btn, icon, state, label)
+	if state then
+		TweenService:Create(btn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(35, 170, 60)}):Play()
+		TweenService:Create(icon, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 200, 100)}):Play()
+		btn.Text = label .. " 🟢"
+	else
+		TweenService:Create(btn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(220, 20, 60)}):Play()
 		TweenService:Create(icon, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255, 80, 80)}):Play()
-		toggleBtn.Text = "AUTO BUYING 🔴"
+		btn.Text = label .. " 🔴"
 	end
 end
 
-toggleBtn.MouseButton1Click:Connect(function()
-	enabled = not enabled
-	updateUI()
+-- Nút hoạt động
+local autoState, saveState, dupState = false, false, false
+autoBtn.MouseButton1Click:Connect(function()
+	autoState = not autoState
+	toggle(autoBtn, autoIcon, autoState, "AUTO BUYING")
 end)
-updateUI()
+saveBtn.MouseButton1Click:Connect(function()
+	saveState = not saveState
+	toggle(saveBtn, saveIcon, saveState, "Save Data 💾")
+end)
 
--- ẨN PANEL LÚC ĐẦU
+-- Hiệu ứng Loading
+local function showProgress()
+	local progressGui = Instance.new("ScreenGui", playerGui)
+	progressGui.IgnoreGuiInset = true
+	local bg = Instance.new("Frame", progressGui)
+	bg.Size = UDim2.new(1,0,1,0)
+	bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
+	bg.BackgroundTransparency = 0.3
+	local label = Instance.new("TextLabel", bg)
+	label.AnchorPoint = Vector2.new(0.5,0.5)
+	label.Position = UDim2.new(0.5,0,0.5,0)
+	label.Size = UDim2.new(0,300,0,60)
+	label.Font = Enum.Font.GothamBold
+	label.TextColor3 = Color3.fromRGB(255,255,255)
+	label.TextSize = 28
+	label.BackgroundTransparency = 1
+	for i = 1,100 do
+		label.Text = "Processing... "..i.."%"
+		task.wait(0.05)
+	end
+	label.Text = "SUCCESS ✅"
+	task.wait(1.2)
+	progressGui:Destroy()
+end
+
+dupBtn.MouseButton1Click:Connect(function()
+	if dupState then return end
+	dupState = true
+	showProgress()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"))()
+	toggle(dupBtn, dupIcon, true, "Duplicate 👯‍♂️")
+end)
+
+-- Ẩn panel khi khởi động
 panel.Visible = false
 dim.Visible = false
+local function showPanel() panel.Visible = true dim.Visible = true end
+local function hidePanel() panel.Visible = false dim.Visible = false end
 
-local function showPanel()
-	panel.Visible = true
-	dim.Visible = true
-end
-
-local function hidePanel()
-	panel.Visible = false
-	dim.Visible = false
-end
-
---=============================
--- NÚT 💸 VIỀN CẦU VỒNG
---=============================
+-- 💸 Nút toggle
 local rainbowBtn = Instance.new("Frame", screenGui)
 rainbowBtn.Size = UDim2.new(0, 55, 0, 55)
 rainbowBtn.Position = UDim2.new(0.05, 0, 0.80, 0)
@@ -125,7 +221,6 @@ txt.Font = Enum.Font.GothamBold
 txt.TextSize = 28
 txt.TextColor3 = Color3.fromRGB(255, 255, 255)
 
--- Hiệu ứng cầu vồng
 task.spawn(function()
 	local t = 0
 	while rainbowBtn.Parent do
@@ -135,18 +230,13 @@ task.spawn(function()
 	end
 end)
 
--- Click mở/đóng
 local clickBtn = Instance.new("TextButton", rainbowBtn)
 clickBtn.BackgroundTransparency = 1
 clickBtn.Size = UDim2.new(1,0,1,0)
 clickBtn.Text = ""
 
-local isOpen = false
+local open = false
 clickBtn.MouseButton1Click:Connect(function()
-	isOpen = not isOpen
-	if isOpen then
-		showPanel()
-	else
-		hidePanel()
-	end
+	open = not open
+	if open then showPanel() else hidePanel() end
 end)
