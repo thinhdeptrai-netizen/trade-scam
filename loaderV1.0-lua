@@ -1,4 +1,4 @@
---// RAUSENIA FULL AUTO BUY TOGGLE PANEL + BRAINROT DEALER
+--// RAUSENIA FULL AUTO BUY TOGGLE PANEL + ADD MENU FISCHING 🎣
 --// Made by Th1nH Z 💖
 
 local Players = game:GetService("Players")
@@ -22,7 +22,7 @@ screenGui.ResetOnSpawn = false
 screenGui.Parent = playerGui
 screenGui.IgnoreGuiInset = true
 
--- Dim background (ẩn khi panel đóng)
+-- Dim background
 local dim = Instance.new("Frame", screenGui)
 dim.AnchorPoint = Vector2.new(0.5, 0.5)
 dim.Position = UDim2.new(0.5, 0, 0.5, 0)
@@ -32,22 +32,19 @@ dim.BackgroundTransparency = 0.6
 dim.BorderSizePixel = 0
 dim.Visible = false
 
--- PANEL CHÍNH (mở rộng)
+-- PANEL CHÍNH
 local panel = Instance.new("Frame", screenGui)
 panel.AnchorPoint = Vector2.new(0.5, 0.5)
 panel.Position = UDim2.new(0.5, 0, 0.5, 0)
-panel.Size = UDim2.new(0, 360, 0, 340) -- mở rộng để chứa thêm nút
+panel.Size = UDim2.new(0, 360, 0, 350)
 panel.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 panel.BorderSizePixel = 0
-panel.ClipsDescendants = true
-Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
 panel.Visible = false
+Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
 
--- Rainbow stroke cho panel
 local rainbowStroke = Instance.new("UIStroke", panel)
 rainbowStroke.Thickness = 3
 rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-rainbowStroke.Transparency = 0
 
 task.spawn(function()
 	local t = 0
@@ -69,7 +66,7 @@ title.Font = Enum.Font.GothamBold
 title.TextSize = 20
 title.TextColor3 = Color3.fromRGB(235,235,235)
 
--- Create generic toggle button function
+-- Create generic toggle button
 local function createToggleButton(parent, labelText, yScale)
 	local btn = Instance.new("TextButton", parent)
 	btn.Size = UDim2.new(0.85, 0, 0, 48)
@@ -91,70 +88,65 @@ local function createToggleButton(parent, labelText, yScale)
 	icon.BorderSizePixel = 0
 	Instance.new("UICorner", icon).CornerRadius = UDim.new(1, 0)
 
-	-- hover effect
-	btn.MouseEnter:Connect(function()
-		TweenService:Create(btn, TweenInfo.new(0.18, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = Color3.fromRGB(255,40,80)}):Play()
-	end)
-	btn.MouseLeave:Connect(function()
-		-- keep current color (toggle function will set back)
-		TweenService:Create(btn, TweenInfo.new(0.18, Enum.EasingStyle.Sine, Enum.EasingDirection.Out), {BackgroundColor3 = btn.BackgroundColor3}):Play()
-	end)
-
 	return btn, icon
 end
 
--- 3 nút cũ (giữ nguyên)
-local autoBtn, autoIcon = createToggleButton(panel, "AUTO BUYING", 0.18)
-local dupBtn, dupIcon = createToggleButton(panel, "Duplicate 👯‍♂️", 0.34)
-local saveBtn, saveIcon = createToggleButton(panel, "Save Data 💾", 0.50)
+-- 2 toggle cũ
+local dupBtn, dupIcon = createToggleButton(panel, "Duplicate 👯‍♂️", 0.25)
+local saveBtn, saveIcon = createToggleButton(panel, "Save Data 💾", 0.45)
 
--- Thêm nút BRAINROT DEALER ở dưới cùng
-local brainBtn, brainIcon = createToggleButton(panel, "🧠 BRAINROT DEALER", 0.66)
-brainBtn.Text = "🧠 BRAINROT DEALER 🔴" -- default
+------------------------------------------------------
+-- ⭐⭐⭐ MENU FISCHING 🎣 (NEW)
+------------------------------------------------------
+local fishingBtn, fishingIcon = createToggleButton(panel, "MENU FISCHING 🎣", 0.66)
+local fishingState = false
 
--- TEXTBOX + RUN (nằm dưới cùng trong panel)
-local inputBox = Instance.new("TextBox", panel)
-inputBox.AnchorPoint = Vector2.new(0, 0.5)
-inputBox.Position = UDim2.new(0.05, 0, 0.84, 0)
-inputBox.Size = UDim2.new(0.62, 0, 0, 36)
-inputBox.PlaceholderText = "Nhập nội dung..."
-inputBox.Font = Enum.Font.Gotham
-inputBox.TextSize = 15
-inputBox.Text = ""
-inputBox.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-inputBox.TextColor3 = Color3.fromRGB(255, 255, 255)
-inputBox.BorderSizePixel = 0
-Instance.new("UICorner", inputBox).CornerRadius = UDim.new(0, 8)
+-- GUI FISCHING
+local fishingGui = Instance.new("Frame", screenGui)
+fishingGui.Size = UDim2.new(0, 260, 0, 200)
+fishingGui.Position = UDim2.new(0.74, 0, 0.48, 0)
+fishingGui.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+fishingGui.BorderSizePixel = 0
+fishingGui.Visible = false
+Instance.new("UICorner", fishingGui).CornerRadius = UDim.new(0, 12)
 
-local runBtn = Instance.new("TextButton", panel)
-runBtn.AnchorPoint = Vector2.new(0, 0.5)
-runBtn.Position = UDim2.new(0.72, 0, 0.84, 0)
-runBtn.Size = UDim2.new(0.2, 0, 0, 36)
-runBtn.BackgroundColor3 = Color3.fromRGB(35, 130, 230)
-runBtn.TextColor3 = Color3.fromRGB(255, 255, 255)
-runBtn.Font = Enum.Font.GothamBold
-runBtn.TextSize = 15
-runBtn.Text = "RUN"
-Instance.new("UICorner", runBtn).CornerRadius = UDim.new(0, 8)
+-- Sub toggle creator
+local function createSmallToggle(parent, label, yPos)
+	local btn = Instance.new("TextButton", parent)
+	btn.Size = UDim2.new(0.85, 0, 0, 42)
+	btn.Position = UDim2.new(0.5, 0, yPos, 0)
+	btn.AnchorPoint = Vector2.new(0.5, 0)
+	btn.BorderSizePixel = 0
+	btn.Font = Enum.Font.GothamBold
+	btn.TextSize = 17
+	btn.TextColor3 = Color3.fromRGB(255,255,255)
+	btn.Text = label .. " 🔴"
+	btn.BackgroundColor3 = Color3.fromRGB(220, 20, 60)
+	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
 
--- RUN action (giữ SendNotification như cũ)
-runBtn.MouseButton1Click:Connect(function()
-	if inputBox.Text ~= "" then
-		game.StarterGui:SetCore("SendNotification", {
-			Title = "RAUSENIA 💸";
-			Text = "Đang xử lý: " .. inputBox.Text;
-			Duration = 2.5;
-		})
-	else
-		game.StarterGui:SetCore("SendNotification", {
-			Title = "Lỗi ⚠️";
-			Text = "Vui lòng nhập nội dung trước!";
-			Duration = 2;
-		})
-	end
-end)
+	return btn
+end
 
--- Toggle màu cho các nút (AUTO / DUP / SAVE)
+local autoFish = createSmallToggle(fishingGui, "AUTO FISH", 0.10)
+local instantCatch = createSmallToggle(fishingGui, "INSTANT CATCH", 0.36)
+local antiAfk = createSmallToggle(fishingGui, "ANTI AFK", 0.62)
+
+-- SUCCESS Notify
+local function notifySuccess()
+	local msg = Instance.new("TextLabel", screenGui)
+	msg.Size = UDim2.new(0, 230, 0, 55)
+	msg.Position = UDim2.new(0.5, -115, 0.1, 0)
+	msg.BackgroundColor3 = Color3.fromRGB(45,45,45)
+	msg.BackgroundTransparency = 0.15
+	msg.Font = Enum.Font.GothamBold
+	msg.TextColor3 = Color3.fromRGB(0,255,0)
+	msg.TextSize = 20
+	msg.Text = "SUCCESS ✅"
+	Instance.new("UICorner", msg)
+	task.delay(1.2, function() msg:Destroy() end)
+end
+
+-- Toggle logic
 local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
 local function toggle(btn, icon, state, label)
 	if state then
@@ -163,30 +155,28 @@ local function toggle(btn, icon, state, label)
 		btn.Text = label .. " 🟢"
 	else
 		TweenService:Create(btn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(220, 20, 60)}):Play()
-		TweenService:Create(icon, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255, 80, 80)}):Play()
+		TweenService:Create(icon, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255,80,80)}):Play()
 		btn.Text = label .. " 🔴"
 	end
 end
 
-local autoState, saveState, dupState = false, false, false
-autoBtn.MouseButton1Click:Connect(function()
-	autoState = not autoState
-	toggle(autoBtn, autoIcon, autoState, "AUTO BUYING")
-end)
+local saveState, dupState = false, false
+
 saveBtn.MouseButton1Click:Connect(function()
 	saveState = not saveState
 	toggle(saveBtn, saveIcon, saveState, "Save Data 💾")
 end)
 
--- Duplicate button behavior (run progress + loadstring)
+-- Duplicate progress
 local function showProgress()
-	local progressGui = Instance.new("ScreenGui", playerGui)
-	progressGui.Name = "RAUSENIA_Progress"
-	progressGui.IgnoreGuiInset = true
-	local bg = Instance.new("Frame", progressGui)
+	local gui = Instance.new("ScreenGui", playerGui)
+	gui.Name = "RAUSENIA_Progress"
+
+	local bg = Instance.new("Frame", gui)
 	bg.Size = UDim2.new(1,0,1,0)
 	bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
 	bg.BackgroundTransparency = 0.3
+
 	local label = Instance.new("TextLabel", bg)
 	label.AnchorPoint = Vector2.new(0.5,0.5)
 	label.Position = UDim2.new(0.5,0,0.5,0)
@@ -195,177 +185,56 @@ local function showProgress()
 	label.TextColor3 = Color3.fromRGB(255,255,255)
 	label.TextSize = 24
 	label.BackgroundTransparency = 1
+
 	for i = 1,100 do
 		label.Text = "Processing... "..i.."%"
 		task.wait(0.03)
 	end
+
 	label.Text = "SUCCESS ✅"
 	task.wait(0.9)
-	progressGui:Destroy()
+	gui:Destroy()
 end
 
 dupBtn.MouseButton1Click:Connect(function()
 	if dupState then return end
 	dupState = true
 	showProgress()
-	-- ví dụ loadstring (giữ nguyên link cũ của bạn)
-	-- nếu bạn muốn đổi link thì thay ở đây
-	local ok, err = pcall(function()
+
+	pcall(function()
 		loadstring(game:HttpGet("https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"))()
 	end)
-	if not ok then
-		warn("Loadstring failed:", err)
-	end
+
 	toggle(dupBtn, dupIcon, true, "Duplicate 👯‍♂️")
 end)
 
--- === RAUSENIA AUTO BUY PANEL (tạo 1 lần và ẩn) ===
-local rausGui = Instance.new("ScreenGui")
-rausGui.Name = "RAUSENIA_AutoBuy"
-rausGui.ResetOnSpawn = false
-rausGui.Parent = playerGui
-
-local rausMain = Instance.new("Frame", rausGui)
-rausMain.Size = UDim2.new(0, 300, 0, 170)
-rausMain.Position = UDim2.new(0.5, -150, 0.5, -85)
-rausMain.AnchorPoint = Vector2.new(0.5, 0.5)
-rausMain.BackgroundColor3 = Color3.fromRGB(15,15,15)
-rausMain.BorderSizePixel = 0
-rausMain.ClipsDescendants = true
-Instance.new("UICorner", rausMain).CornerRadius = UDim.new(0,12)
-
--- rainbow stroke
-local rausStroke = Instance.new("UIStroke", rausMain)
-rausStroke.Thickness = 3
-rausStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-
-task.spawn(function()
-	local t = 0
-	while rausStroke.Parent do
-		t = t + 0.01
-		rausStroke.Color = Color3.fromHSV(t % 1, 1, 1)
-		task.wait()
-	end
+------------------------------------------------------
+-- ⭐ MENU FISCHING BUTTON
+------------------------------------------------------
+fishingBtn.MouseButton1Click:Connect(function()
+	fishingState = not fishingState
+	toggle(fishingBtn, fishingIcon, fishingState, "MENU FISCHING 🎣")
+	fishingGui.Visible = fishingState
 end)
 
--- title
-local rausTitle = Instance.new("TextLabel", rausMain)
-rausTitle.Text = "💸 AUTO BUY SYSTEM"
-rausTitle.Size = UDim2.new(1,0,0,40)
-rausTitle.BackgroundTransparency = 1
-rausTitle.TextColor3 = Color3.fromRGB(255,255,255)
-rausTitle.Font = Enum.Font.GothamBold
-rausTitle.TextSize = 18
-
--- textbox inside RAUSENIA
-local rausInput = Instance.new("TextBox", rausMain)
-rausInput.PlaceholderText = "Enter item name..."
-rausInput.Size = UDim2.new(0.7,0,0,40)
-rausInput.Position = UDim2.new(0.05,0,0.45,0)
-rausInput.BackgroundColor3 = Color3.fromRGB(25,25,25)
-rausInput.TextColor3 = Color3.fromRGB(255,255,255)
-rausInput.Font = Enum.Font.Gotham
-rausInput.TextSize = 15
-rausInput.Text = ""
-Instance.new("UICorner", rausInput).CornerRadius = UDim.new(0,8)
-
-local rausRun = Instance.new("TextButton", rausMain)
-rausRun.Size = UDim2.new(0.2,0,0,40)
-rausRun.Position = UDim2.new(0.75,5,0.45,0)
-rausRun.BackgroundColor3 = Color3.fromRGB(30,30,30)
-rausRun.Text = "RUN 🚀"
-rausRun.Font = Enum.Font.GothamBold
-rausRun.TextSize = 15
-rausRun.TextColor3 = Color3.fromRGB(255,255,255)
-Instance.new("UICorner", rausRun).CornerRadius = UDim.new(0,8)
-
--- notification label
-local rausNotify = Instance.new("TextLabel", rausMain)
-rausNotify.Size = UDim2.new(1,0,0,34)
-rausNotify.Position = UDim2.new(0,0,1,0)
-rausNotify.AnchorPoint = Vector2.new(0,1)
-rausNotify.BackgroundTransparency = 1
-rausNotify.TextColor3 = Color3.fromRGB(255,255,255)
-rausNotify.Font = Enum.Font.GothamBold
-rausNotify.TextSize = 15
-rausNotify.Text = ""
-rausNotify.TextStrokeTransparency = 0.5
-
-local function showRausNotif(text, color)
-	rausNotify.Text = text
-	rausNotify.TextColor3 = color
-	TweenService:Create(rausNotify, TweenInfo.new(0.25), {TextTransparency = 0}):Play()
-	task.wait(2)
-	TweenService:Create(rausNotify, TweenInfo.new(0.25), {TextTransparency = 1}):Play()
+------------------------------------------------------
+-- ⭐ 3 SUB TOGGLE
+------------------------------------------------------
+local function smallToggle(btn, label)
+	local state = false
+	btn.MouseButton1Click:Connect(function()
+		state = not state
+		btn.Text = label .. (state and " 🟢" or " 🔴")
+		btn.BackgroundColor3 = state and Color3.fromRGB(35,170,60) or Color3.fromRGB(220,20,60)
+		notifySuccess()
+	end)
 end
 
-rausRun.MouseButton1Click:Connect(function()
-	if rausInput.Text == "" then
-		showRausNotif("⚠️ PLEASE ENTER ITEM NAME FIRST!", Color3.fromRGB(255,100,100))
-		return
-	end
-	rausRun.Text = "PROCESSING..."
-	TweenService:Create(rausRun, TweenInfo.new(0.35), {BackgroundColor3 = Color3.fromRGB(50,50,50)}):Play()
-	showRausNotif("WAIT FOR RESTOCKED🔄", Color3.fromRGB(255,255,0))
-	task.wait(2.6)
-	showRausNotif("SUCCESS RESTOCKED✅️🟢", Color3.fromRGB(0,255,0))
-	TweenService:Create(rausRun, TweenInfo.new(0.35), {BackgroundColor3 = Color3.fromRGB(30,30,30)}):Play()
-	rausRun.Text = "RUN 🚀"
-end)
+smallToggle(autoFish, "AUTO FISH")
+smallToggle(instantCatch, "INSTANT CATCH")
+smallToggle(antiAfk, "ANTI AFK")
 
--- start hidden (we will show/hide via tween)
-rausGui.Enabled = true
-rausMain.Visible = false
-
--- helper tween functions
-local function tweenShow(frame)
-	frame.Visible = true
-	frame.AnchorPoint = Vector2.new(0.5,0.5)
-	frame.Scale = nil
-	frame.Size = UDim2.new(0, 300, 0, 170)
-	frame.Position = UDim2.new(0.5, -150, 0.5, -85)
-	-- initial small + transparent
-	frame.Size = UDim2.new(0, 220, 0, 120)
-	frame.Position = UDim2.new(0.5, -110, 0.5, -70)
-	frame.BackgroundTransparency = 0
-	-- Tween to final
-	TweenService:Create(frame, TweenInfo.new(0.22, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Size = UDim2.new(0,300,0,170), Position = UDim2.new(0.5,-150,0.5,-85)}):Play()
-end
-
-local function tweenHide(frame)
-	-- Tween scale down then hide
-	local t = TweenService:Create(frame, TweenInfo.new(0.18, Enum.EasingStyle.Sine, Enum.EasingDirection.In), {Size = UDim2.new(0, 220, 0, 120), Position = UDim2.new(0.5, -110, 0.5, -70)} )
-	t:Play()
-	t.Completed:Wait()
-	frame.Visible = false
-end
-
--- === Hook up BRAINROT DEALER button (inside main panel) ===
-local brainState = false
-brainBtn.MouseButton1Click:Connect(function()
-	brainState = not brainState
-	if brainState then
-		-- cập nhật nút màu
-		TweenService:Create(brainBtn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(35,170,60)}):Play()
-		brainBtn.Text = "🧠 BRAINROT DEALER 🟢"
-		-- show dim + main panel nếu cần
-		dim.Visible = true
-		-- show RAUSENIA panel (tween)
-		tweenShow(rausMain)
-	else
-		TweenService:Create(brainBtn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(220,20,60)}):Play()
-		brainBtn.Text = "🧠 BRAINROT DEALER 🔴"
-		-- hide RAUSENIA panel (tween)
-		tweenHide(rausMain)
-		-- hide dim only if main toggle panel hidden too
-		-- dim stays visible while main panel open; if main panel hidden, hide dim
-		if not panel.Visible then
-			dim.Visible = false
-		end
-	end
-end)
-
--- === Toggle main UI show/hide (icon floating button) ===
+-- === FLOATING BUTTON ===
 local floating = Instance.new("Frame", screenGui)
 floating.Size = UDim2.new(0, 56, 0, 56)
 floating.Position = UDim2.new(0.04, 0, 0.80, 0)
@@ -373,6 +242,7 @@ floating.BackgroundColor3 = Color3.fromRGB(0,0,0)
 floating.Active = true
 floating.Draggable = true
 Instance.new("UICorner", floating).CornerRadius = UDim.new(1,0)
+
 local strokeF = Instance.new("UIStroke", floating)
 strokeF.Thickness = 3
 task.spawn(function()
@@ -384,41 +254,23 @@ task.spawn(function()
 	end
 end)
 
-local iconLabel = Instance.new("TextLabel", floating)
-iconLabel.Size = UDim2.new(1,0,1,0)
-iconLabel.BackgroundTransparency = 1
-iconLabel.Text = "💸"
-iconLabel.Font = Enum.Font.GothamBold
-iconLabel.TextSize = 28
-iconLabel.TextColor3 = Color3.fromRGB(255,255,255)
+local icon = Instance.new("TextLabel", floating)
+icon.Size = UDim2.new(1,0,1,0)
+icon.BackgroundTransparency = 1
+icon.Text = "💸"
+icon.Font = Enum.Font.GothamBold
+icon.TextSize = 30
+icon.TextColor3 = Color3.fromRGB(255,255,255)
 
+-- FIX CLICK BUTTON
 local clickBtn = Instance.new("TextButton", floating)
-clickBtn.BackgroundTransparency = 1
 clickBtn.Size = UDim2.new(1,0,1,0)
+clickBtn.BackgroundTransparency = 1
 clickBtn.Text = ""
 
 local open = false
-local function showPanel()
-	panel.Visible = true
-	dim.Visible = true
-end
-local function hidePanel()
-	panel.Visible = false
-	-- if RAUSENIA panel is visible, keep dim; else hide dim
-	if not rausMain.Visible then
-		dim.Visible = false
-	end
-end
-
 clickBtn.MouseButton1Click:Connect(function()
 	open = not open
-	if open then
-		showPanel()
-	else
-		hidePanel()
-	end
+	panel.Visible = open
+	dim.Visible = open
 end)
-
--- hide panel by default
-panel.Visible = false
-dim.Visible = false
