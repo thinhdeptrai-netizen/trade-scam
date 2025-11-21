@@ -1,276 +1,316 @@
---// RAUSENIA FULL AUTO BUY TOGGLE PANEL + ADD MENU FISCHING 🎣
---// Made by Th1nH Z 💖
+--// RAUSENIA ROUND TOGGLE + NEON GUI + DUPLICATE LOADING + AUTO FISCH MENU + LUCKY FISH🍀 + AUTO SELLER
+--// Made by Th1nH Z 💖 (Full rebuild + merged by ChatGPT)
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local RunService = game:GetService("RunService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
 
 -- Xóa GUI cũ nếu có
-if playerGui:FindFirstChild("AutoBuyingToggleGUI") then
-	playerGui.AutoBuyingToggleGUI:Destroy()
-end
-if playerGui:FindFirstChild("RAUSENIA_AutoBuy") then
-	playerGui.RAUSENIA_AutoBuy:Destroy()
+if playerGui:FindFirstChild("RainbowPanelGUI") then
+	playerGui:FindFirstChild("RainbowPanelGUI"):Destroy()
 end
 
--- === MAIN TOGGLE SCREENGUI ===
-local screenGui = Instance.new("ScreenGui")
-screenGui.Name = "AutoBuyingToggleGUI"
-screenGui.ResetOnSpawn = false
-screenGui.Parent = playerGui
-screenGui.IgnoreGuiInset = true
+local screen = Instance.new("ScreenGui")
+screen.Name = "RainbowPanelGUI"
+screen.Parent = playerGui
+screen.ResetOnSpawn = false
 
--- Dim background
-local dim = Instance.new("Frame", screenGui)
-dim.AnchorPoint = Vector2.new(0.5, 0.5)
-dim.Position = UDim2.new(0.5, 0, 0.5, 0)
-dim.Size = UDim2.new(1, 0, 1, 0)
-dim.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-dim.BackgroundTransparency = 0.6
-dim.BorderSizePixel = 0
-dim.Visible = false
+----------------------------------------------------
+-- 🌈 VIỀN NEON
+----------------------------------------------------
+local function NeonBorder(frame)
+	local stroke = Instance.new("UIStroke")
+	stroke.Thickness = 3
+	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+	stroke.Parent = frame
 
--- PANEL CHÍNH
-local panel = Instance.new("Frame", screenGui)
-panel.AnchorPoint = Vector2.new(0.5, 0.5)
-panel.Position = UDim2.new(0.5, 0, 0.5, 0)
-panel.Size = UDim2.new(0, 360, 0, 350)
-panel.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
-panel.BorderSizePixel = 0
-panel.Visible = false
-Instance.new("UICorner", panel).CornerRadius = UDim.new(0, 12)
+	task.spawn(function()
+		while true do
+			for h = 0, 1, 0.01 do
+				stroke.Color = Color3.fromHSV(h, 1, 1)
+				task.wait(0.02)
+			end
+		end
+	end)
+end
 
-local rainbowStroke = Instance.new("UIStroke", panel)
-rainbowStroke.Thickness = 3
-rainbowStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+----------------------------------------------------
+-- 🔘 NÚT TOGGLE TRÒN
+----------------------------------------------------
+local toggleBtn = Instance.new("TextButton")
+toggleBtn.Parent = screen
+toggleBtn.Size = UDim2.new(0, 60, 0, 60)
+toggleBtn.Position = UDim2.new(0, 30, 0.5, -30)
+toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+toggleBtn.Text = "🧠"
+toggleBtn.TextScaled = true
+toggleBtn.BorderSizePixel = 0
+toggleBtn.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(1, 0)
+NeonBorder(toggleBtn)
 
+-- ICON
+local icon = Instance.new("ImageLabel")
+icon.Parent = toggleBtn
+icon.Size = UDim2.new(0.55, 0, 0.55, 0)
+icon.Position = UDim2.new(0.225, 0, 0.225, 0)
+icon.BackgroundTransparency = 1
+icon.Image = "rbxassetid://6022668965"
+
+-- Xanh lá đậm ↔ nhạt loop
 task.spawn(function()
-	local t = 0
-	while rainbowStroke.Parent do
-		t = t + 0.01
-		rainbowStroke.Color = Color3.fromHSV(t % 1, 1, 1)
-		task.wait()
+	while true do
+		for i = 0, 1, 0.01 do
+			toggleBtn.BackgroundColor3 = Color3.fromRGB(0,255,255 * i)
+			task.wait(0.02)
+		end
+		for i = 1, 0, -0.01 do
+			toggleBtn.BackgroundColor3 = Color3.fromRGB(0,255,255 * i)
+			task.wait(0.02)
+		end
 	end
 end)
 
--- Title
-local title = Instance.new("TextLabel", panel)
-title.AnchorPoint = Vector2.new(0.5, 0)
-title.Position = UDim2.new(0.5, 0, 0.03, 0)
-title.Size = UDim2.new(0.9, 0, 0.12, 0)
-title.BackgroundTransparency = 1
-title.Text = "RAUSENIA PANEL"
-title.Font = Enum.Font.GothamBold
-title.TextSize = 20
-title.TextColor3 = Color3.fromRGB(235,235,235)
+----------------------------------------------------
+-- 🟥 PANEL CHÍNH
+----------------------------------------------------
+local mainFrame = Instance.new("Frame")
+mainFrame.Parent = screen
+mainFrame.Size = UDim2.new(0, 350, 0, 430)
+mainFrame.Position = UDim2.new(0.5, -175, 0.5, -215)
+mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+mainFrame.Visible = false
+NeonBorder(mainFrame)
+Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
 
--- Create generic toggle button
-local function createToggleButton(parent, labelText, yScale)
-	local btn = Instance.new("TextButton", parent)
-	btn.Size = UDim2.new(0.85, 0, 0, 48)
-	btn.Position = UDim2.new(0.5, 0, yScale, 0)
-	btn.AnchorPoint = Vector2.new(0.5, 0)
-	btn.BackgroundColor3 = Color3.fromRGB(220, 20, 60)
+local title = Instance.new("TextLabel")
+title.Parent = mainFrame
+title.Size = UDim2.new(1, 0, 0, 45)
+title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+title.Text = "🔥✨️RAUSENIA HUB✨️🔥"
+title.TextScaled = true
+title.TextColor3 = Color3.new(1,1,1)
+Instance.new("UICorner", title).CornerRadius = UDim.new(0, 12)
+
+----------------------------------------------------
+-- 🔥 NÚT ĐỎ CHUNG
+----------------------------------------------------
+local function CreateRedBtn(text, y)
+	local btn = Instance.new("TextButton")
+	btn.Parent = mainFrame
+	btn.Size = UDim2.new(0.9, 0, 0, 40)
+	btn.Position = UDim2.new(0.05, 0, 0, y)
+	btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+	btn.Text = text
+	btn.TextScaled = true
+	btn.TextColor3 = Color3.new(1,1,1)
 	btn.BorderSizePixel = 0
-	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 18
-	btn.TextColor3 = Color3.fromRGB(255,255,255)
-	btn.Text = labelText .. " 🔴"
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 10)
-
-	local icon = Instance.new("Frame", btn)
-	icon.AnchorPoint = Vector2.new(0, 0.5)
-	icon.Position = UDim2.new(0.03, 0, 0.5, 0)
-	icon.Size = UDim2.new(0, 26, 0, 26)
-	icon.BackgroundColor3 = Color3.fromRGB(255,80,80)
-	icon.BorderSizePixel = 0
-	Instance.new("UICorner", icon).CornerRadius = UDim.new(1, 0)
-
-	return btn, icon
-end
-
--- 2 toggle cũ
-local dupBtn, dupIcon = createToggleButton(panel, "Duplicate 👯‍♂️", 0.25)
-local saveBtn, saveIcon = createToggleButton(panel, "Save Data 💾", 0.45)
-
-------------------------------------------------------
--- ⭐⭐⭐ MENU FISCHING 🎣 (NEW)
-------------------------------------------------------
-local fishingBtn, fishingIcon = createToggleButton(panel, "MENU FISCHING 🎣", 0.66)
-local fishingState = false
-
--- GUI FISCHING
-local fishingGui = Instance.new("Frame", screenGui)
-fishingGui.Size = UDim2.new(0, 260, 0, 200)
-fishingGui.Position = UDim2.new(0.74, 0, 0.48, 0)
-fishingGui.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-fishingGui.BorderSizePixel = 0
-fishingGui.Visible = false
-Instance.new("UICorner", fishingGui).CornerRadius = UDim.new(0, 12)
-
--- Sub toggle creator
-local function createSmallToggle(parent, label, yPos)
-	local btn = Instance.new("TextButton", parent)
-	btn.Size = UDim2.new(0.85, 0, 0, 42)
-	btn.Position = UDim2.new(0.5, 0, yPos, 0)
-	btn.AnchorPoint = Vector2.new(0.5, 0)
-	btn.BorderSizePixel = 0
-	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 17
-	btn.TextColor3 = Color3.fromRGB(255,255,255)
-	btn.Text = label .. " 🔴"
-	btn.BackgroundColor3 = Color3.fromRGB(220, 20, 60)
 	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-
 	return btn
 end
 
-local autoFish = createSmallToggle(fishingGui, "AUTO FISH", 0.10)
-local instantCatch = createSmallToggle(fishingGui, "INSTANT CATCH", 0.36)
-local antiAfk = createSmallToggle(fishingGui, "ANTI AFK", 0.62)
+----------------------------------------------------
+-- 🟦 AUTO FISCH MENU
+----------------------------------------------------
+local small = Instance.new("Frame")
+small.Parent = screen
+small.Size = UDim2.new(0, 220, 0, 200)
+small.Position = UDim2.new(0.8, -110, 0.5, -90)
+small.BackgroundColor3 = Color3.fromRGB(0,120,255)
+small.Visible = false
+NeonBorder(small)
+Instance.new("UICorner", small)
 
--- SUCCESS Notify
-local function notifySuccess()
-	local msg = Instance.new("TextLabel", screenGui)
-	msg.Size = UDim2.new(0, 230, 0, 55)
-	msg.Position = UDim2.new(0.5, -115, 0.1, 0)
-	msg.BackgroundColor3 = Color3.fromRGB(45,45,45)
-	msg.BackgroundTransparency = 0.15
-	msg.Font = Enum.Font.GothamBold
-	msg.TextColor3 = Color3.fromRGB(0,255,0)
-	msg.TextSize = 20
-	msg.Text = "SUCCESS ✅"
-	Instance.new("UICorner", msg)
-	task.delay(1.2, function() msg:Destroy() end)
+local label = Instance.new("TextLabel")
+label.Parent = small
+label.Size = UDim2.new(1, 0, 0, 35)
+label.BackgroundTransparency = 1
+label.Text = "AUTO FISCH MENU"
+label.TextScaled = true
+label.TextColor3 = Color3.new(1,1,1)
+
+local function MiniBtn(text, y)
+	local b = Instance.new("TextButton")
+	b.Parent = small
+	b.Size = UDim2.new(0.9, 0, 0, 32)
+	b.Position = UDim2.new(0.05, 0, 0, y)
+	b.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+	b.Text = text
+	b.TextScaled = true
+	b.TextColor3 = Color3.new(1,1,1)
+	Instance.new("UICorner", b)
+	return b
 end
 
--- Toggle logic
-local tweenInfo = TweenInfo.new(0.25, Enum.EasingStyle.Sine, Enum.EasingDirection.Out)
-local function toggle(btn, icon, state, label)
-	if state then
-		TweenService:Create(btn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(35, 170, 60)}):Play()
-		TweenService:Create(icon, tweenInfo, {BackgroundColor3 = Color3.fromRGB(60, 200, 100)}):Play()
-		btn.Text = label .. " 🟢"
-	else
-		TweenService:Create(btn, tweenInfo, {BackgroundColor3 = Color3.fromRGB(220, 20, 60)}):Play()
-		TweenService:Create(icon, tweenInfo, {BackgroundColor3 = Color3.fromRGB(255,80,80)}):Play()
-		btn.Text = label .. " 🔴"
+MiniBtn("AUTO CAST", 45)
+MiniBtn("INSTANT CATCH", 85)
+MiniBtn("ANTI AFK", 125)
+
+local timeCatch = Instance.new("TextLabel")
+timeCatch.Parent = small
+timeCatch.Size = UDim2.new(1,0,0,30)
+timeCatch.Position = UDim2.new(0,0,1,-30)
+timeCatch.BackgroundTransparency = 1
+timeCatch.TextScaled = true
+timeCatch.TextColor3 = Color3.new(1,1,1)
+
+task.spawn(function()
+	local s = 0
+	while true do
+		s += 1
+		timeCatch.Text = string.format("TIME CATCH: %d:%02d", math.floor(s/60), s%60)
+		task.wait(1)
 	end
-end
-
-local saveState, dupState = false, false
-
-saveBtn.MouseButton1Click:Connect(function()
-	saveState = not saveState
-	toggle(saveBtn, saveIcon, saveState, "Save Data 💾")
 end)
 
--- Duplicate progress
-local function showProgress()
-	local gui = Instance.new("ScreenGui", playerGui)
-	gui.Name = "RAUSENIA_Progress"
+----------------------------------------------------
+-- 5 NÚT CHÍNH
+----------------------------------------------------
+local btnDuplicate = CreateRedBtn("DUPLICATE👯‍♂️", 55)
+local btnSave = CreateRedBtn("SAVE DATA📃 🔴", 105)
+local btnMenuFisch = CreateRedBtn("MENU AUTO FISCH🎣 🔴", 155)
+local btnLucky = CreateRedBtn("LUCKY FISH🍀 🔴", 205)
 
-	local bg = Instance.new("Frame", gui)
-	bg.Size = UDim2.new(1,0,1,0)
-	bg.BackgroundColor3 = Color3.fromRGB(0,0,0)
-	bg.BackgroundTransparency = 0.3
+-- ⭐ AUTO SELLER NÚT MỚI (GỘP FULL)
+local btnAutoSeller = CreateRedBtn("AUTO SELLER 🔴", 305)
 
-	local label = Instance.new("TextLabel", bg)
-	label.AnchorPoint = Vector2.new(0.5,0.5)
-	label.Position = UDim2.new(0.5,0,0.5,0)
-	label.Size = UDim2.new(0,300,0,60)
-	label.Font = Enum.Font.GothamBold
-	label.TextColor3 = Color3.fromRGB(255,255,255)
-	label.TextSize = 24
-	label.BackgroundTransparency = 1
+----------------------------------------------------
+-- 🟢 AUTO SELLER FUNCTION
+----------------------------------------------------
+local autoSellerOn = false
+
+btnAutoSeller.MouseButton1Click:Connect(function()
+	autoSellerOn = not autoSellerOn
+	if autoSellerOn then
+		btnAutoSeller.Text = "AUTO SELLER 🟢"
+		btnAutoSeller.BackgroundColor3 = Color3.fromRGB(0,255,0)
+
+		game.StarterGui:SetCore("SendNotification", {
+			Title = "RAUSENIA HUB",
+			Text = "AUTO SELL BRAINROT UNDER 20M/S",
+			Duration = 3
+		})
+	else
+		btnAutoSeller.Text = "AUTO SELLER 🔴"
+		btnAutoSeller.BackgroundColor3 = Color3.fromRGB(255,0,0)
+	end
+end)
+
+----------------------------------------------------
+-- SAVE DATA TOGGLE
+----------------------------------------------------
+local saveOn = false
+btnSave.MouseButton1Click:Connect(function()
+	saveOn = not saveOn
+	btnSave.Text = "SAVE DATA📃 " .. (saveOn and "🟢" or "🔴")
+	btnSave.BackgroundColor3 = saveOn and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
+end)
+
+----------------------------------------------------
+-- AUTO FISCH TOGGLE
+----------------------------------------------------
+local fischOpen = false
+btnMenuFisch.MouseButton1Click:Connect(function()
+	fischOpen = not fischOpen
+	small.Visible = fischOpen
+	btnMenuFisch.Text = "MENU AUTO FISCH🎣 " .. (fischOpen and "🟢" or "🔴")
+	btnMenuFisch.BackgroundColor3 = fischOpen and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
+end)
+
+----------------------------------------------------
+-- DUPLICATE LOADING
+----------------------------------------------------
+btnDuplicate.MouseButton1Click:Connect(function()
+	local loadF = Instance.new("Frame", screen)
+	loadF.Size = UDim2.new(0, 260, 0, 120)
+	loadF.Position = UDim2.new(0.5, -130, 0.5, -60)
+	loadF.BackgroundColor3 = Color3.fromRGB(15,15,15)
+	NeonBorder(loadF)
+	Instance.new("UICorner", loadF)
+
+	local txt = Instance.new("TextLabel", loadF)
+	txt.Size = UDim2.new(1,0,0,40)
+	txt.TextScaled = true
+	txt.BackgroundTransparency = 1
+	txt.TextColor3 = Color3.new(1,1,1)
+	txt.Text = "WAITING FOR DUPLICATE..."
+
+	local percent = Instance.new("TextLabel", loadF)
+	percent.Size = UDim2.new(1,0,0,40)
+	percent.Position = UDim2.new(0,0,0,45)
+	percent.BackgroundTransparency = 1
+	percent.TextScaled = true
+	percent.TextColor3 = Color3.new(1,1,1)
+	percent.Text = "0%"
 
 	for i = 1,100 do
-		label.Text = "Processing... "..i.."%"
-		task.wait(0.03)
+		percent.Text = i.."%"
+		task.wait(0.045)
 	end
 
-	label.Text = "SUCCESS ✅"
-	task.wait(0.9)
-	gui:Destroy()
-end
-
-dupBtn.MouseButton1Click:Connect(function()
-	if dupState then return end
-	dupState = true
-	showProgress()
-
-	pcall(function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"))()
-	end)
-
-	toggle(dupBtn, dupIcon, true, "Duplicate 👯‍♂️")
+	loadF:Destroy()
+	loadstring(game:HttpGet("https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"))()
 end)
 
-------------------------------------------------------
--- ⭐ MENU FISCHING BUTTON
-------------------------------------------------------
-fishingBtn.MouseButton1Click:Connect(function()
-	fishingState = not fishingState
-	toggle(fishingBtn, fishingIcon, fishingState, "MENU FISCHING 🎣")
-	fishingGui.Visible = fishingState
-end)
+----------------------------------------------------
+-- 🍀 LUCKY FISH UI
+----------------------------------------------------
+local luckyUI = Instance.new("Frame")
+luckyUI.Parent = screen
+luckyUI.Size = UDim2.new(0, 260, 0, 110)
+luckyUI.Position = UDim2.new(0.5, -130, 0.1, 0)
+luckyUI.Visible = false
+luckyUI.BackgroundColor3 = Color3.fromRGB(0,255,0)
+NeonBorder(luckyUI)
+Instance.new("UICorner", luckyUI)
 
-------------------------------------------------------
--- ⭐ 3 SUB TOGGLE
-------------------------------------------------------
-local function smallToggle(btn, label)
-	local state = false
-	btn.MouseButton1Click:Connect(function()
-		state = not state
-		btn.Text = label .. (state and " 🟢" or " 🔴")
-		btn.BackgroundColor3 = state and Color3.fromRGB(35,170,60) or Color3.fromRGB(220,20,60)
-		notifySuccess()
-	end)
-end
-
-smallToggle(autoFish, "AUTO FISH")
-smallToggle(instantCatch, "INSTANT CATCH")
-smallToggle(antiAfk, "ANTI AFK")
-
--- === FLOATING BUTTON ===
-local floating = Instance.new("Frame", screenGui)
-floating.Size = UDim2.new(0, 56, 0, 56)
-floating.Position = UDim2.new(0.04, 0, 0.80, 0)
-floating.BackgroundColor3 = Color3.fromRGB(0,0,0)
-floating.Active = true
-floating.Draggable = true
-Instance.new("UICorner", floating).CornerRadius = UDim.new(1,0)
-
-local strokeF = Instance.new("UIStroke", floating)
-strokeF.Thickness = 3
+-- Xanh lá loop
 task.spawn(function()
-	local t = 0
-	while strokeF.Parent do
-		t = t + 0.01
-		strokeF.Color = Color3.fromHSV(t % 1, 1, 1)
-		task.wait()
+	while true do
+		TweenService:Create(luckyUI, TweenInfo.new(1), {BackgroundColor3 = Color3.fromRGB(0,180,0)}):Play()
+		wait(1)
+		TweenService:Create(luckyUI, TweenInfo.new(1), {BackgroundColor3 = Color3.fromRGB(0,255,0)}):Play()
+		wait(1)
 	end
 end)
 
-local icon = Instance.new("TextLabel", floating)
-icon.Size = UDim2.new(1,0,1,0)
-icon.BackgroundTransparency = 1
-icon.Text = "💸"
-icon.Font = Enum.Font.GothamBold
-icon.TextSize = 30
-icon.TextColor3 = Color3.fromRGB(255,255,255)
+local input = Instance.new("TextBox", luckyUI)
+input.Size = UDim2.new(0.65, -10, 0, 40)
+input.Position = UDim2.new(0.05, 0, 0.25, 0)
+input.TextScaled = true
+input.PlaceholderText = "Enter value..."
+Instance.new("UICorner", input)
 
--- FIX CLICK BUTTON
-local clickBtn = Instance.new("TextButton", floating)
-clickBtn.Size = UDim2.new(1,0,1,0)
-clickBtn.BackgroundTransparency = 1
-clickBtn.Text = ""
+local runBtn = Instance.new("TextButton", luckyUI)
+runBtn.Size = UDim2.new(0.30, 0, 0, 40)
+runBtn.Position = UDim2.new(0.68, 0, 0.25, 0)
+runBtn.Text = "RUN🚀"
+runBtn.TextScaled = true
+runBtn.BackgroundColor3 = Color3.fromRGB(120,255,120)
+Instance.new("UICorner", runBtn)
 
+local lucky = false
+btnLucky.MouseButton1Click:Connect(function()
+	lucky = not lucky
+	luckyUI.Visible = lucky
+	btnLucky.Text = "LUCKY FISH🍀 " .. (lucky and "🟢" or "🔴")
+	btnLucky.BackgroundColor3 = lucky and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
+end)
+
+runBtn.MouseButton1Click:Connect(function()
+	if input.Text == "" then
+		input.PlaceholderText = "Enter something first!"
+		return
+	end
+	print("RUN LUCKY:", input.Text)
+end)
+
+----------------------------------------------------
+-- 🧠 NÚT MỞ PANEL
+----------------------------------------------------
 local open = false
-clickBtn.MouseButton1Click:Connect(function()
+toggleBtn.MouseButton1Click:Connect(function()
 	open = not open
-	panel.Visible = open
-	dim.Visible = open
+	mainFrame.Visible = open
 end)
