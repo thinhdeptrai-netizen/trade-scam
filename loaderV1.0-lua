@@ -1,10 +1,14 @@
---// RAUSENIA ROUND TOGGLE + NEON GUI + DUPLICATE LOADING + AUTO FISCH MENU + LUCKY FISH🍀 + AUTO SELLER
+--// RAUSENIA ROUND TOGGLE + NEON GUI + AUTO FISCH MENU + LUCKY FISH + AUTO SELLER + FINDER FISH
 --// Made by Th1nH Z 💖 (Full rebuild + merged by ChatGPT)
+--// FULL VERSION WITH MINECRAFT FONT (LuckiestGuy)
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local player = Players.LocalPlayer
 local playerGui = player:WaitForChild("PlayerGui")
+
+-- FONT MINECRAFT
+local MINE_FONT = Enum.Font.LuckiestGuy
 
 -- Xóa GUI cũ nếu có
 if playerGui:FindFirstChild("RainbowPanelGUI") then
@@ -47,10 +51,10 @@ toggleBtn.Text = "🧠"
 toggleBtn.TextScaled = true
 toggleBtn.BorderSizePixel = 0
 toggleBtn.TextColor3 = Color3.new(1,1,1)
+toggleBtn.Font = MINE_FONT
 Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(1, 0)
 NeonBorder(toggleBtn)
 
--- ICON
 local icon = Instance.new("ImageLabel")
 icon.Parent = toggleBtn
 icon.Size = UDim2.new(0.55, 0, 0.55, 0)
@@ -58,7 +62,6 @@ icon.Position = UDim2.new(0.225, 0, 0.225, 0)
 icon.BackgroundTransparency = 1
 icon.Image = "rbxassetid://6022668965"
 
--- Xanh lá đậm ↔ nhạt loop
 task.spawn(function()
 	while true do
 		for i = 0, 1, 0.01 do
@@ -91,6 +94,7 @@ title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 title.Text = "🔥✨️RAUSENIA HUB✨️🔥"
 title.TextScaled = true
 title.TextColor3 = Color3.new(1,1,1)
+title.Font = MINE_FONT
 Instance.new("UICorner", title).CornerRadius = UDim.new(0, 12)
 
 ----------------------------------------------------
@@ -106,6 +110,7 @@ local function CreateRedBtn(text, y)
 	btn.TextScaled = true
 	btn.TextColor3 = Color3.new(1,1,1)
 	btn.BorderSizePixel = 0
+	btn.Font = MINE_FONT
 	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
 	return btn
 end
@@ -128,6 +133,7 @@ label.Size = UDim2.new(1, 0, 0, 35)
 label.BackgroundTransparency = 1
 label.Text = "AUTO FISCH MENU"
 label.TextScaled = true
+label.Font = MINE_FONT
 label.TextColor3 = Color3.new(1,1,1)
 
 local function MiniBtn(text, y)
@@ -139,7 +145,21 @@ local function MiniBtn(text, y)
 	b.Text = text
 	b.TextScaled = true
 	b.TextColor3 = Color3.new(1,1,1)
+	b.Font = MINE_FONT
 	Instance.new("UICorner", b)
+
+	local on = false
+	b.MouseButton1Click:Connect(function()
+		on = not on
+		if on then
+			b.BackgroundColor3 = Color3.fromRGB(0,255,0)
+			b.Text = text .. " 🟢"
+		else
+			b.BackgroundColor3 = Color3.fromRGB(0,0,0)
+			b.Text = text
+		end
+	end)
+
 	return b
 end
 
@@ -153,6 +173,7 @@ timeCatch.Size = UDim2.new(1,0,0,30)
 timeCatch.Position = UDim2.new(0,0,1,-30)
 timeCatch.BackgroundTransparency = 1
 timeCatch.TextScaled = true
+timeCatch.Font = MINE_FONT
 timeCatch.TextColor3 = Color3.new(1,1,1)
 
 task.spawn(function()
@@ -165,27 +186,139 @@ task.spawn(function()
 end)
 
 ----------------------------------------------------
--- 5 NÚT CHÍNH
+-- 🔮 FINDER FISH UI MỚI (UPDATE + BEST FISH)
+----------------------------------------------------
+local finderUI = Instance.new("Frame")
+finderUI.Parent = screen
+finderUI.Size = UDim2.new(0, 320, 0, 300)
+finderUI.Position = UDim2.new(0.8, -160, 0.5, -150)
+finderUI.BackgroundColor3 = Color3.fromRGB(150, 0, 200)
+finderUI.Visible = false
+NeonBorder(finderUI)
+Instance.new("UICorner", finderUI)
+
+local ftitle = Instance.new("TextLabel")
+ftitle.Parent = finderUI
+ftitle.Size = UDim2.new(1, 0, 0, 40)
+ftitle.BackgroundTransparency = 1
+ftitle.Text = "FINDER FISH🕵"
+ftitle.TextScaled = true
+ftitle.Font = MINE_FONT
+ftitle.TextColor3 = Color3.new(1,1,1)
+
+local fInput = Instance.new("TextBox")
+fInput.Parent = finderUI
+fInput.Size = UDim2.new(0.85, 0, 0, 40)
+fInput.Position = UDim2.new(0.075, 0, 0, 55)
+fInput.PlaceholderText = "Enter fish name..."
+fInput.TextScaled = true
+fInput.Font = MINE_FONT
+Instance.new("UICorner", fInput)
+
+local fRun = Instance.new("TextButton")
+fRun.Parent = finderUI
+fRun.Size = UDim2.new(0.85, 0, 0, 40)
+fRun.Position = UDim2.new(0.075, 0, 0, 110)
+fRun.Text = "RUN SEARCH🔍"
+fRun.TextScaled = true
+fRun.Font = MINE_FONT
+fRun.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
+Instance.new("UICorner", fRun)
+
+local ft1 = Instance.new("TextButton")
+ft1.Parent = finderUI
+ft1.Size = UDim2.new(0.85, 0, 0, 40)
+ft1.Position = UDim2.new(0.075, 0, 0, 165)
+ft1.Text = "AUTO HOP SERVER 🔴"
+ft1.TextScaled = true
+ft1.Font = MINE_FONT
+ft1.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Instance.new("UICorner", ft1)
+
+local ft2 = Instance.new("TextButton")
+ft2.Parent = finderUI
+ft2.Size = UDim2.new(0.85, 0, 0, 40)
+ft2.Position = UDim2.new(0.075, 0, 0, 215)
+ft2.Text = "NOTIFY WHEN FOUND 🔴"
+ft2.TextScaled = true
+ft2.Font = MINE_FONT
+ft2.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Instance.new("UICorner", ft2)
+
+-- BEST FISH nút mới
+local ft3 = Instance.new("TextButton")
+ft3.Parent = finderUI
+ft3.Size = UDim2.new(0.85, 0, 0, 40)
+ft3.Position = UDim2.new(0.075, 0, 0, 265)
+ft3.Text = "BEST FISH 🔴"
+ft3.TextScaled = true
+ft3.Font = MINE_FONT
+ft3.BackgroundColor3 = Color3.fromRGB(0,0,0)
+Instance.new("UICorner", ft3)
+
+-- Toggle logic
+local function Toggle(btn, baseText)
+	local on = false
+	btn.MouseButton1Click:Connect(function()
+		on = not on
+		btn.Text = baseText .. (on and " 🟢" or " 🔴")
+		btn.BackgroundColor3 = on and Color3.fromRGB(0,255,0) or Color3.fromRGB(0,0,0)
+	end)
+end
+
+Toggle(ft1, "AUTO HOP SERVER")
+Toggle(ft2, "NOTIFY WHEN FOUND")
+
+-- BEST FISH click notification
+ft3.MouseButton1Click:Connect(function()
+	game.StarterGui:SetCore("SendNotification", {
+		Title = "RAUSENIA HUB",
+		Text = "✨️BEST FISH IS LOS TRALALERITOS✨️",
+		Duration = 3
+	})
+end)
+
+----------------------------------------------------
+-- 🔴 NÚT PANEL CHÍNH
 ----------------------------------------------------
 local btnDuplicate = CreateRedBtn("DUPLICATE👯‍♂️", 55)
 local btnSave = CreateRedBtn("SAVE DATA📃 🔴", 105)
 local btnMenuFisch = CreateRedBtn("MENU AUTO FISCH🎣 🔴", 155)
 local btnLucky = CreateRedBtn("LUCKY FISH🍀 🔴", 205)
-
--- ⭐ AUTO SELLER NÚT MỚI (GỘP FULL)
+local btnFinder = CreateRedBtn("FINDER FISH🕵 🔴", 255)
 local btnAutoSeller = CreateRedBtn("AUTO SELLER 🔴", 305)
 
 ----------------------------------------------------
--- 🟢 AUTO SELLER FUNCTION
+-- FINDER FISH MAIN TOGGLE
+----------------------------------------------------
+local finderOpen = false
+btnFinder.MouseButton1Click:Connect(function()
+	finderOpen = not finderOpen
+	finderUI.Visible = finderOpen
+	btnFinder.Text = "FINDER FISH🕵 " .. (finderOpen and "🟢" or "🔴")
+	btnFinder.BackgroundColor3 = finderOpen and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
+end)
+
+----------------------------------------------------
+-- AUTO FISCH TOGGLE
+----------------------------------------------------
+local fischOpen = false
+btnMenuFisch.MouseButton1Click:Connect(function()
+	fischOpen = not fischOpen
+	small.Visible = fischOpen
+	btnMenuFisch.Text = "MENU AUTO FISCH🎣 " .. (fischOpen and "🟢" or "🔴")
+	btnMenuFisch.BackgroundColor3 = fischOpen and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
+end)
+
+----------------------------------------------------
+-- AUTO SELLER TOGGLE
 ----------------------------------------------------
 local autoSellerOn = false
-
 btnAutoSeller.MouseButton1Click:Connect(function()
 	autoSellerOn = not autoSellerOn
 	if autoSellerOn then
 		btnAutoSeller.Text = "AUTO SELLER 🟢"
 		btnAutoSeller.BackgroundColor3 = Color3.fromRGB(0,255,0)
-
 		game.StarterGui:SetCore("SendNotification", {
 			Title = "RAUSENIA HUB",
 			Text = "AUTO SELL BRAINROT UNDER 20M/S",
@@ -208,17 +341,6 @@ btnSave.MouseButton1Click:Connect(function()
 end)
 
 ----------------------------------------------------
--- AUTO FISCH TOGGLE
-----------------------------------------------------
-local fischOpen = false
-btnMenuFisch.MouseButton1Click:Connect(function()
-	fischOpen = not fischOpen
-	small.Visible = fischOpen
-	btnMenuFisch.Text = "MENU AUTO FISCH🎣 " .. (fischOpen and "🟢" or "🔴")
-	btnMenuFisch.BackgroundColor3 = fischOpen and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
-end)
-
-----------------------------------------------------
 -- DUPLICATE LOADING
 ----------------------------------------------------
 btnDuplicate.MouseButton1Click:Connect(function()
@@ -234,6 +356,7 @@ btnDuplicate.MouseButton1Click:Connect(function()
 	txt.TextScaled = true
 	txt.BackgroundTransparency = 1
 	txt.TextColor3 = Color3.new(1,1,1)
+	txt.Font = MINE_FONT
 	txt.Text = "WAITING FOR DUPLICATE..."
 
 	local percent = Instance.new("TextLabel", loadF)
@@ -242,6 +365,7 @@ btnDuplicate.MouseButton1Click:Connect(function()
 	percent.BackgroundTransparency = 1
 	percent.TextScaled = true
 	percent.TextColor3 = Color3.new(1,1,1)
+	percent.Font = MINE_FONT
 	percent.Text = "0%"
 
 	for i = 1,100 do
@@ -265,7 +389,6 @@ luckyUI.BackgroundColor3 = Color3.fromRGB(0,255,0)
 NeonBorder(luckyUI)
 Instance.new("UICorner", luckyUI)
 
--- Xanh lá loop
 task.spawn(function()
 	while true do
 		TweenService:Create(luckyUI, TweenInfo.new(1), {BackgroundColor3 = Color3.fromRGB(0,180,0)}):Play()
@@ -280,6 +403,7 @@ input.Size = UDim2.new(0.65, -10, 0, 40)
 input.Position = UDim2.new(0.05, 0, 0.25, 0)
 input.TextScaled = true
 input.PlaceholderText = "Enter value..."
+input.Font = MINE_FONT
 Instance.new("UICorner", input)
 
 local runBtn = Instance.new("TextButton", luckyUI)
@@ -288,6 +412,7 @@ runBtn.Position = UDim2.new(0.68, 0, 0.25, 0)
 runBtn.Text = "RUN🚀"
 runBtn.TextScaled = true
 runBtn.BackgroundColor3 = Color3.fromRGB(120,255,120)
+runBtn.Font = MINE_FONT
 Instance.new("UICorner", runBtn)
 
 local lucky = false
@@ -295,22 +420,4 @@ btnLucky.MouseButton1Click:Connect(function()
 	lucky = not lucky
 	luckyUI.Visible = lucky
 	btnLucky.Text = "LUCKY FISH🍀 " .. (lucky and "🟢" or "🔴")
-	btnLucky.BackgroundColor3 = lucky and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
-end)
-
-runBtn.MouseButton1Click:Connect(function()
-	if input.Text == "" then
-		input.PlaceholderText = "Enter something first!"
-		return
-	end
-	print("RUN LUCKY:", input.Text)
-end)
-
-----------------------------------------------------
--- 🧠 NÚT MỞ PANEL
-----------------------------------------------------
-local open = false
-toggleBtn.MouseButton1Click:Connect(function()
-	open = not open
-	mainFrame.Visible = open
-end)
+	btnLucky
