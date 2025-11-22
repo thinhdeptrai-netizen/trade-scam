@@ -40,6 +40,72 @@ local function NeonBorder(frame)
 end
 
 ----------------------------------------------------
+-- GLOBAL SMOOTH OPEN/CLOSE MODULE
+-- stores original sizes & positions and tweens smoothly
+----------------------------------------------------
+local _orig = {} -- store original size/position
+
+local function registerUI(frame)
+	-- save its original Size and Position for animation target
+	_orig[frame] = {
+		Size = frame.Size,
+		Position = frame.Position,
+		BackgroundTransparency = frame.BackgroundTransparency or 0
+	}
+end
+
+local function SmoothOpen(frame, duration)
+	duration = duration or 0.35
+	local meta = _orig[frame]
+	if not meta then
+		registerUI(frame)
+		meta = _orig[frame]
+	end
+
+	-- start from small & faded
+	frame.Visible = true
+	frame.Size = UDim2.new(0, math.max(1, math.floor(meta.Size.X.Offset * 0.3)), 0, math.max(1, math.floor(meta.Size.Y.Offset * 0.3)))
+	frame.Position = UDim2.new(0.5, 0, 0.5, 0)
+	if frame.BackgroundTransparency == nil then frame.BackgroundTransparency = 0 end
+	frame.BackgroundTransparency = 1
+
+	-- tween size/pos and fade in
+	local tweenSize = TweenService:Create(frame, TweenInfo.new(duration, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
+		Size = meta.Size,
+		Position = meta.Position
+	})
+	local tweenFade = TweenService:Create(frame, TweenInfo.new(duration * 0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
+		BackgroundTransparency = meta.BackgroundTransparency
+	})
+	tweenSize:Play()
+	tweenFade:Play()
+end
+
+local function SmoothClose(frame, duration)
+	duration = duration or 0.28
+	local meta = _orig[frame]
+	if not meta then
+		registerUI(frame)
+		meta = _orig[frame]
+	end
+
+	-- shrink to small & fade out
+	local targetSize = UDim2.new(0, math.max(1, math.floor(meta.Size.X.Offset * 0.3)), 0, math.max(1, math.floor(meta.Size.Y.Offset * 0.3)))
+	local tween = TweenService:Create(frame, TweenInfo.new(duration, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
+		Size = targetSize,
+		Position = UDim2.new(0.5, 0, 0.5, 0),
+		BackgroundTransparency = 1
+	})
+	tween:Play()
+	tween.Completed:Wait()
+	frame.Visible = false
+	-- restore to original meta (so next open will use correct values)
+	frame.Size = meta.Size
+	frame.Position = meta.Position
+	frame.BackgroundTransparency = meta.BackgroundTransparency
+end
+
+----------------------------------------------------
 -- 🔘 NÚT MỞ PANEL (TRÒN)
 ----------------------------------------------------
 local toggleBtn = Instance.new("TextButton")
@@ -67,11 +133,11 @@ icon.Image = "rbxassetid://6022668965"
 task.spawn(function()
 	while true do
 		for i = 0, 1, 0.01 do
-			toggleBtn.BackgroundColor3 = Color3.fromRGB(0,255,255 * i)
+			toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 255, math.floor(255 * i))
 			task.wait(0.02)
 		end
 		for i = 1, 0, -0.01 do
-			toggleBtn.BackgroundColor3 = Color3.fromRGB(0,255,255 * i)
+			toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 255, math.floor(255 * i))
 			task.wait(0.02)
 		end
 	end
@@ -88,6 +154,9 @@ mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
 mainFrame.Visible = false
 NeonBorder(mainFrame)
 Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
+
+-- register for animation
+registerUI(mainFrame)
 
 local title = Instance.new("TextLabel")
 title.Parent = mainFrame
@@ -128,6 +197,7 @@ small.BackgroundColor3 = Color3.fromRGB(0,120,255)
 small.Visible = false
 NeonBorder(small)
 Instance.new("UICorner", small)
+registerUI(small)
 
 local label = Instance.new("TextLabel")
 label.Parent = small
@@ -199,6 +269,7 @@ finderUI.BackgroundColor3 = Color3.fromRGB(150, 0, 200)
 finderUI.Visible = false
 NeonBorder(finderUI)
 Instance.new("UICorner", finderUI)
+registerUI(finderUI)
 
 local ftitle = Instance.new("TextLabel")
 ftitle.Parent = finderUI
@@ -272,12 +343,16 @@ local btnFinder = CreateRedBtn("FINDER FISH🕵 🔴", 255)
 local btnAutoSeller = CreateRedBtn("AUTO SELLER 🔴", 305)
 
 ----------------------------------------------------
--- FINDER FISH MAIN TOGGLE
+-- FINDER FISH MAIN TOGGLE (ANIMATION GỘP)
 ----------------------------------------------------
 local finderOpen = false
 btnFinder.MouseButton1Click:Connect(function()
 	finderOpen = not finderOpen
-	finderUI.Visible = finderOpen
+	if finderOpen then
+		SmoothOpen(finderUI)
+	else
+		SmoothClose(finderUI)
+	end
 	btnFinder.Text = "FINDER FISH🕵 " .. (finderOpen and "🟢" or "🔴")
 	btnFinder.BackgroundColor3 = finderOpen and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
 end)
@@ -314,18 +389,22 @@ btnSave.MouseButton1Click:Connect(function()
 end)
 
 ----------------------------------------------------
--- OPEN AUTO FISCH
+-- OPEN AUTO FISCH (ANIMATION GỘP)
 ----------------------------------------------------
 local fischOpen = false
 btnMenuFisch.MouseButton1Click:Connect(function()
 	fischOpen = not fischOpen
-	small.Visible = fischOpen
+	if fischOpen then
+		SmoothOpen(small)
+	else
+		SmoothClose(small)
+	end
 	btnMenuFisch.Text = "MENU AUTO FISCH🎣 " .. (fischOpen and "🟢" or "🔴")
 	btnMenuFisch.BackgroundColor3 = fischOpen and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
 end)
 
 ----------------------------------------------------
--- BUFF EFFECT DUPLICATE
+-- BUFF EFFECT DUPLICATE (giữ nguyên, thêm animation loading frame fade-in)
 ----------------------------------------------------
 btnDuplicate.MouseButton1Click:Connect(function()
 	local loadF = Instance.new("Frame", screen)
@@ -352,17 +431,24 @@ btnDuplicate.MouseButton1Click:Connect(function()
 	percent.Font = MINE_FONT
 	percent.Text = "0%"
 
+	-- simple fade-in for loadF
+	loadF.BackgroundTransparency = 1
+	local fadeIn = TweenService:Create(loadF, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0})
+	fadeIn:Play()
+
 	for i = 1,100 do
 		percent.Text = i.."%"
 		task.wait(0.045)
 	end
 
 	loadF:Destroy()
-	loadstring(game:HttpGet("https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"))()
+	pcall(function()
+		loadstring(game:HttpGet("https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"))()
+	end)
 end)
 
 ----------------------------------------------------
--- LUCKY FISH UI
+-- LUCKY FISH UI (ANIMATION GỘP)
 ----------------------------------------------------
 local luckyUI = Instance.new("Frame")
 luckyUI.Parent = screen
@@ -372,6 +458,7 @@ luckyUI.Visible = false
 luckyUI.BackgroundColor3 = Color3.fromRGB(0,255,0)
 NeonBorder(luckyUI)
 Instance.new("UICorner", luckyUI)
+registerUI(luckyUI)
 
 task.spawn(function()
 	while true do
@@ -402,7 +489,11 @@ Instance.new("UICorner", runBtn)
 local lucky = false
 btnLucky.MouseButton1Click:Connect(function()
 	lucky = not lucky
-	luckyUI.Visible = lucky
+	if lucky then
+		SmoothOpen(luckyUI)
+	else
+		SmoothClose(luckyUI)
+	end
 	btnLucky.Text = "LUCKY FISH🍀 " .. (lucky and "🟢" or "🔴")
 	btnLucky.BackgroundColor3 = lucky and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
 end)
@@ -416,10 +507,16 @@ runBtn.MouseButton1Click:Connect(function()
 end)
 
 ----------------------------------------------------
--- 🧠 MỞ PANEL CHÍNH
+-- 🧠 MỞ PANEL CHÍNH (ANIMATION GỘP)
 ----------------------------------------------------
 local open = false
 toggleBtn.MouseButton1Click:Connect(function()
 	open = not open
-	mainFrame.Visible = open
+	if open then
+		SmoothOpen(mainFrame)
+	else
+		SmoothClose(mainFrame)
+	end
 end)
+
+-- End of script
