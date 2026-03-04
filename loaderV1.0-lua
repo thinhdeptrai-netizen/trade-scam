@@ -1,522 +1,301 @@
---// RAUSENIA ROUND TOGGLE + NEON GUI + AUTO FISCH MENU + LUCKY FISH + AUTO SELLER + FINDER FISH
---// Made by Th1nH Z 💖 (Rebuild + Merge + UI Upgrade by ChatGPT)
---// FULL VERSION WITH MINECRAFT FONT (LuckiestGuy)
+--// ===================================
+--// ULTRA PREMIUM NEON TRADE PANEL
+--// FULL MERGED VERSION
+--// ===================================
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
-local player = Players.LocalPlayer
-local playerGui = player:WaitForChild("PlayerGui")
+local UIS = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
 
--- FONT MINECRAFT
-local MINE_FONT = Enum.Font.LuckiestGuy
+local Player = Players.LocalPlayer
 
--- Xóa GUI cũ nếu có
-if playerGui:FindFirstChild("RainbowPanelGUI") then
-	playerGui:FindFirstChild("RainbowPanelGUI"):Destroy()
+if Player.PlayerGui:FindFirstChild("PremiumNeon") then
+	Player.PlayerGui.PremiumNeon:Destroy()
 end
 
-local screen = Instance.new("ScreenGui")
-screen.Name = "RainbowPanelGUI"
-screen.Parent = playerGui
-screen.ResetOnSpawn = false
+local Gui = Instance.new("ScreenGui")
+Gui.Name = "PremiumNeon"
+Gui.ResetOnSpawn = false
+Gui.Parent = Player.PlayerGui
 
-----------------------------------------------------
--- 🌈 VIỀN NEON
-----------------------------------------------------
-local function NeonBorder(frame)
-	local stroke = Instance.new("UIStroke")
-	stroke.Thickness = 3
-	stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-	stroke.Parent = frame
+-- ===============================
+-- MAIN FRAME
+-- ===============================
 
-	task.spawn(function()
-		while true do
-			for h = 0, 1, 0.01 do
-				stroke.Color = Color3.fromHSV(h, 1, 1)
-				task.wait(0.02)
-			end
-		end
+local Main = Instance.new("Frame", Gui)
+Main.Size = UDim2.new(0, 360, 0, 240)
+Main.Position = UDim2.new(0.5, -180, 0.5, -120)
+Main.BackgroundColor3 = Color3.fromRGB(18, 25, 30)
+Main.BorderSizePixel = 0
+Main.Active = true
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 22)
+
+local MainStroke = Instance.new("UIStroke", Main)
+MainStroke.Color = Color3.fromRGB(0,255,210)
+MainStroke.Thickness = 2
+MainStroke.Transparency = 0.25
+
+local MainGradient = Instance.new("UIGradient", Main)
+MainGradient.Color = ColorSequence.new{
+	ColorSequenceKeypoint.new(0, Color3.fromRGB(0,255,210)),
+	ColorSequenceKeypoint.new(1, Color3.fromRGB(0,140,120))
+}
+MainGradient.Rotation = 45
+
+RunService.RenderStepped:Connect(function()
+	MainGradient.Rotation += 0.05
+end)
+
+-- ===============================
+-- TITLE
+-- ===============================
+
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1,0,0,55)
+Title.BackgroundTransparency = 1
+Title.Text = "LIGHTDARK TRADE 🖤"
+Title.Font = Enum.Font.GothamBlack
+Title.TextSize = 22
+Title.TextColor3 = Color3.fromRGB(255,255,255)
+Title.TextStrokeTransparency = 0.6
+Title.TextStrokeColor3 = Color3.fromRGB(0,255,210)
+
+local Credit = Instance.new("TextLabel", Main)
+Credit.Size = UDim2.new(1,0,0,20)
+Credit.Position = UDim2.new(0,0,0,42)
+Credit.BackgroundTransparency = 1
+Credit.Text = "Made by Qthinh"
+Credit.Font = Enum.Font.GothamBold
+Credit.TextSize = 13
+Credit.TextColor3 = Color3.fromRGB(200,200,200)
+
+-- ===============================
+-- NOTIFICATION SYSTEM
+-- ===============================
+
+local function notify(titleText, descText, accent)
+
+	local Noti = Instance.new("Frame", Gui)
+	Noti.Size = UDim2.new(0, 300, 0, 85)
+	Noti.Position = UDim2.new(1, 350, 0.12, 0)
+	Noti.BackgroundColor3 = Color3.fromRGB(20,30,35)
+	Noti.BorderSizePixel = 0
+	Instance.new("UICorner", Noti).CornerRadius = UDim.new(0, 18)
+
+	local Stroke = Instance.new("UIStroke", Noti)
+	Stroke.Color = accent
+	Stroke.Thickness = 2
+	Stroke.Transparency = 0.2
+
+	local Title = Instance.new("TextLabel", Noti)
+	Title.Size = UDim2.new(1,-20,0,35)
+	Title.Position = UDim2.new(0,15,0,8)
+	Title.BackgroundTransparency = 1
+	Title.Text = titleText
+	Title.Font = Enum.Font.GothamBlack
+	Title.TextSize = 16
+	Title.TextColor3 = accent
+	Title.TextXAlignment = Enum.TextXAlignment.Left
+
+	local Desc = Instance.new("TextLabel", Noti)
+	Desc.Size = UDim2.new(1,-20,0,35)
+	Desc.Position = UDim2.new(0,15,0,40)
+	Desc.BackgroundTransparency = 1
+	Desc.Text = descText
+	Desc.Font = Enum.Font.Gotham
+	Desc.TextSize = 13
+	Desc.TextColor3 = Color3.fromRGB(220,220,220)
+	Desc.TextXAlignment = Enum.TextXAlignment.Left
+
+	TweenService:Create(Noti,
+		TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+		{Position = UDim2.new(1, -320, 0.12, 0)}
+	):Play()
+
+	task.delay(3, function()
+		TweenService:Create(Noti,
+			TweenInfo.new(0.4, Enum.EasingStyle.Quad, Enum.EasingDirection.In),
+			{Position = UDim2.new(1, 350, 0.12, 0)}
+		):Play()
+		task.delay(0.4, function()
+			Noti:Destroy()
+		end)
 	end)
 end
 
-----------------------------------------------------
--- GLOBAL SMOOTH OPEN/CLOSE MODULE
--- stores original sizes & positions and tweens smoothly
-----------------------------------------------------
-local _orig = {} -- store original size/position
+-- ===============================
+-- TOGGLE FUNCTION (ON + OFF)
+-- ===============================
 
-local function registerUI(frame)
-	-- save its original Size and Position for animation target
-	_orig[frame] = {
-		Size = frame.Size,
-		Position = frame.Position,
-		BackgroundTransparency = frame.BackgroundTransparency or 0
-	}
-end
+local function createToggle(text, posY, accentColor,
+	onTitle, onDesc,
+	offTitle, offDesc)
 
-local function SmoothOpen(frame, duration)
-	duration = duration or 0.35
-	local meta = _orig[frame]
-	if not meta then
-		registerUI(frame)
-		meta = _orig[frame]
-	end
+	local Holder = Instance.new("Frame", Main)
+	Holder.Size = UDim2.new(0.9,0,0,60)
+	Holder.Position = UDim2.new(0.05,0,posY,0)
+	Holder.BackgroundColor3 = Color3.fromRGB(15,25,30)
+	Holder.BorderSizePixel = 0
+	Instance.new("UICorner", Holder).CornerRadius = UDim.new(0,18)
 
-	-- start from small & faded
-	frame.Visible = true
-	frame.Size = UDim2.new(0, math.max(1, math.floor(meta.Size.X.Offset * 0.3)), 0, math.max(1, math.floor(meta.Size.Y.Offset * 0.3)))
-	frame.Position = UDim2.new(0.5, 0, 0.5, 0)
-	if frame.BackgroundTransparency == nil then frame.BackgroundTransparency = 0 end
-	frame.BackgroundTransparency = 1
+	local Accent = Instance.new("Frame", Holder)
+	Accent.Size = UDim2.new(0,6,1,0)
+	Accent.BackgroundColor3 = accentColor
+	Accent.BorderSizePixel = 0
+	Instance.new("UICorner", Accent).CornerRadius = UDim.new(1,0)
 
-	-- tween size/pos and fade in
-	local tweenSize = TweenService:Create(frame, TweenInfo.new(duration, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {
-		Size = meta.Size,
-		Position = meta.Position
-	})
-	local tweenFade = TweenService:Create(frame, TweenInfo.new(duration * 0.9, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {
-		BackgroundTransparency = meta.BackgroundTransparency
-	})
-	tweenSize:Play()
-	tweenFade:Play()
-end
+	local Glow = Instance.new("UIStroke", Holder)
+	Glow.Color = accentColor
+	Glow.Transparency = 0.5
+	Glow.Thickness = 1.5
 
-local function SmoothClose(frame, duration)
-	duration = duration or 0.28
-	local meta = _orig[frame]
-	if not meta then
-		registerUI(frame)
-		meta = _orig[frame]
-	end
+	local Label = Instance.new("TextLabel", Holder)
+	Label.Size = UDim2.new(0.6,0,1,0)
+	Label.Position = UDim2.new(0,20,0,0)
+	Label.BackgroundTransparency = 1
+	Label.Text = text
+	Label.Font = Enum.Font.GothamBold
+	Label.TextSize = 15
+	Label.TextColor3 = accentColor
+	Label.TextXAlignment = Enum.TextXAlignment.Left
 
-	-- shrink to small & fade out
-	local targetSize = UDim2.new(0, math.max(1, math.floor(meta.Size.X.Offset * 0.3)), 0, math.max(1, math.floor(meta.Size.Y.Offset * 0.3)))
-	local tween = TweenService:Create(frame, TweenInfo.new(duration, Enum.EasingStyle.Quint, Enum.EasingDirection.In), {
-		Size = targetSize,
-		Position = UDim2.new(0.5, 0, 0.5, 0),
-		BackgroundTransparency = 1
-	})
-	tween:Play()
-	tween.Completed:Wait()
-	frame.Visible = false
-	-- restore to original meta (so next open will use correct values)
-	frame.Size = meta.Size
-	frame.Position = meta.Position
-	frame.BackgroundTransparency = meta.BackgroundTransparency
-end
+	local Toggle = Instance.new("Frame", Holder)
+	Toggle.Size = UDim2.new(0,75,0,32)
+	Toggle.Position = UDim2.new(1,-95,0.5,-16)
+	Toggle.BackgroundColor3 = Color3.fromRGB(40,40,40)
+	Toggle.BorderSizePixel = 0
+	Instance.new("UICorner", Toggle).CornerRadius = UDim.new(1,0)
 
-----------------------------------------------------
--- 🔘 NÚT MỞ PANEL (TRÒN)
-----------------------------------------------------
-local toggleBtn = Instance.new("TextButton")
-toggleBtn.Parent = screen
-toggleBtn.Size = UDim2.new(0, 60, 0, 60)
-toggleBtn.Position = UDim2.new(0, 30, 0.5, -30)
-toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
-toggleBtn.Text = "🧠"
-toggleBtn.TextScaled = true
-toggleBtn.BorderSizePixel = 0
-toggleBtn.TextColor3 = Color3.new(1,1,1)
-toggleBtn.Font = MINE_FONT
-Instance.new("UICorner", toggleBtn).CornerRadius = UDim.new(1, 0)
-NeonBorder(toggleBtn)
+	local Circle = Instance.new("Frame", Toggle)
+	Circle.Size = UDim2.new(0,28,0,28)
+	Circle.Position = UDim2.new(0,2,0.5,-14)
+	Circle.BackgroundColor3 = Color3.fromRGB(255,255,255)
+	Circle.BorderSizePixel = 0
+	Instance.new("UICorner", Circle).CornerRadius = UDim.new(1,0)
 
--- ICON
-local icon = Instance.new("ImageLabel")
-icon.Parent = toggleBtn
-icon.Size = UDim2.new(0.55, 0, 0.55, 0)
-icon.Position = UDim2.new(0.225, 0, 0.225, 0)
-icon.BackgroundTransparency = 1
-icon.Image = "rbxassetid://6022668965"
+	local state = false
 
--- Xanh lá loop animation
-task.spawn(function()
-	while true do
-		for i = 0, 1, 0.01 do
-			toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 255, math.floor(255 * i))
-			task.wait(0.02)
-		end
-		for i = 1, 0, -0.01 do
-			toggleBtn.BackgroundColor3 = Color3.fromRGB(0, 255, math.floor(255 * i))
-			task.wait(0.02)
-		end
-	end
-end)
+	local function updateToggle()
 
-----------------------------------------------------
--- 🟥 PANEL CHÍNH
-----------------------------------------------------
-local mainFrame = Instance.new("Frame")
-mainFrame.Parent = screen
-mainFrame.Size = UDim2.new(0, 350, 0, 500)
-mainFrame.Position = UDim2.new(0.5, -175, 0.5, -250)
-mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-mainFrame.Visible = false
-NeonBorder(mainFrame)
-Instance.new("UICorner", mainFrame).CornerRadius = UDim.new(0, 12)
+		TweenService:Create(Circle,
+			TweenInfo.new(0.25),
+			{Position = state and UDim2.new(1,-30,0.5,-14) or UDim2.new(0,2,0.5,-14)}
+		):Play()
 
--- register for animation
-registerUI(mainFrame)
+		TweenService:Create(Toggle,
+			TweenInfo.new(0.25),
+			{BackgroundColor3 = state and accentColor or Color3.fromRGB(40,40,40)}
+		):Play()
 
-local title = Instance.new("TextLabel")
-title.Parent = mainFrame
-title.Size = UDim2.new(1, 0, 0, 45)
-title.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-title.Text = "🔥✨️RAUSENIA HUB✨️🔥"
-title.TextScaled = true
-title.TextColor3 = Color3.new(1,1,1)
-title.Font = MINE_FONT
-Instance.new("UICorner", title).CornerRadius = UDim.new(0, 12)
+		Glow.Transparency = state and 0 or 0.5
 
-----------------------------------------------------
--- 🔥 NÚT ĐỎ CHUNG
-----------------------------------------------------
-local function CreateRedBtn(text, y)
-	local btn = Instance.new("TextButton")
-	btn.Parent = mainFrame
-	btn.Size = UDim2.new(0.9, 0, 0, 40)
-	btn.Position = UDim2.new(0.05, 0, 0, y)
-	btn.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
-	btn.Text = text
-	btn.TextScaled = true
-	btn.TextColor3 = Color3.new(1,1,1)
-	btn.BorderSizePixel = 0
-	btn.Font = MINE_FONT
-	Instance.new("UICorner", btn).CornerRadius = UDim.new(0, 8)
-	return btn
-end
-
-----------------------------------------------------
--- 🟦 UI AUTO FISCH (NHỎ)
-----------------------------------------------------
-local small = Instance.new("Frame")
-small.Parent = screen
-small.Size = UDim2.new(0, 220, 0, 200)
-small.Position = UDim2.new(0.8, -110, 0.5, -90)
-small.BackgroundColor3 = Color3.fromRGB(0,120,255)
-small.Visible = false
-NeonBorder(small)
-Instance.new("UICorner", small)
-registerUI(small)
-
-local label = Instance.new("TextLabel")
-label.Parent = small
-label.Size = UDim2.new(1, 0, 0, 35)
-label.BackgroundTransparency = 1
-label.Text = "AUTO FISCH MENU"
-label.TextScaled = true
-label.Font = MINE_FONT
-label.TextColor3 = Color3.new(1,1,1)
-
--- Tạo nút nhỏ
-local function MiniBtn(text, y)
-	local b = Instance.new("TextButton")
-	b.Parent = small
-	b.Size = UDim2.new(0.9, 0, 0, 32)
-	b.Position = UDim2.new(0.05, 0, 0, y)
-	b.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-	b.Text = text
-	b.TextScaled = true
-	b.TextColor3 = Color3.new(1,1,1)
-	b.Font = MINE_FONT
-	Instance.new("UICorner", b)
-
-	local on = false
-	b.MouseButton1Click:Connect(function()
-		on = not on
-		if on then
-			b.BackgroundColor3 = Color3.fromRGB(0,255,0)
-			b.Text = text .. " 🟢"
+		if state then
+			notify(onTitle, onDesc, accentColor)
 		else
-			b.BackgroundColor3 = Color3.fromRGB(0,0,0)
-			b.Text = text
+			notify(offTitle, offDesc, Color3.fromRGB(255,70,70))
+		end
+	end
+
+	Toggle.InputBegan:Connect(function(input)
+		if input.UserInputType == Enum.UserInputType.MouseButton1
+		or input.UserInputType == Enum.UserInputType.Touch then
+			state = not state
+			updateToggle()
 		end
 	end)
-
-	return b
 end
 
-MiniBtn("AUTO CAST", 45)
-MiniBtn("INSTANT CATCH", 85)
-MiniBtn("ANTI AFK", 125)
+-- CREATE TOGGLES
 
-local timeCatch = Instance.new("TextLabel")
-timeCatch.Parent = small
-timeCatch.Size = UDim2.new(1,0,0,30)
-timeCatch.Position = UDim2.new(0,0,1,-30)
-timeCatch.BackgroundTransparency = 1
-timeCatch.TextScaled = true
-timeCatch.Font = MINE_FONT
-timeCatch.TextColor3 = Color3.new(1,1,1)
+createToggle(
+	"FREEZE TRADE",
+	0.38,
+	Color3.fromRGB(0,255,210),
+	"FREEZE TRADE ON",
+	"Đóng băng trade đã được bật",
+	"FREEZE TRADE OFF",
+	"Đóng băng trade đã được tắt"
+)
 
-task.spawn(function()
-	local s = 0
-	while true do
-		s += 1
-		timeCatch.Text = string.format("TIME CATCH: %d:%02d", math.floor(s/60), s%60)
-		task.wait(1)
+createToggle(
+	"AUTO ACCEPT",
+	0.68,
+	Color3.fromRGB(255,80,200),
+	"AUTO ACCEPT ON",
+	"Người trade đã accept",
+	"AUTO ACCEPT OFF",
+	"Auto accept đã được tắt"
+)
+
+-- ===============================
+-- DRAG MAIN PANEL
+-- ===============================
+
+local draggingMain = false
+local dragStartMain
+local startPosMain
+
+Main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+		draggingMain = true
+		dragStartMain = input.Position
+		startPosMain = Main.Position
+
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				draggingMain = false
+			end
+		end)
 	end
 end)
 
-----------------------------------------------------
--- 🔮 UI FINDER FISH (MỚI – TÍM – RỘNG HƠN – NÚT CÁCH XA)
-----------------------------------------------------
-local finderUI = Instance.new("Frame")
-finderUI.Parent = screen
-finderUI.Size = UDim2.new(0, 320, 0, 260)
-finderUI.Position = UDim2.new(0.8, -160, 0.5, -130)
-finderUI.BackgroundColor3 = Color3.fromRGB(150, 0, 200)
-finderUI.Visible = false
-NeonBorder(finderUI)
-Instance.new("UICorner", finderUI)
-registerUI(finderUI)
+UIS.InputChanged:Connect(function(input)
+	if draggingMain and (input.UserInputType == Enum.UserInputType.MouseMovement
+	or input.UserInputType == Enum.UserInputType.Touch) then
 
-local ftitle = Instance.new("TextLabel")
-ftitle.Parent = finderUI
-ftitle.Size = UDim2.new(1, 0, 0, 40)
-ftitle.BackgroundTransparency = 1
-ftitle.Text = "FINDER FISH🕵"
-ftitle.TextScaled = true
-ftitle.Font = MINE_FONT
-ftitle.TextColor3 = Color3.new(1,1,1)
-
-local fInput = Instance.new("TextBox")
-fInput.Parent = finderUI
-fInput.Size = UDim2.new(0.85, 0, 0, 40)
-fInput.Position = UDim2.new(0.075, 0, 0, 55)
-fInput.PlaceholderText = "Enter fish name..."
-fInput.TextScaled = true
-fInput.Font = MINE_FONT
-Instance.new("UICorner", fInput)
-
-local fRun = Instance.new("TextButton")
-fRun.Parent = finderUI
-fRun.Size = UDim2.new(0.85, 0, 0, 40)
-fRun.Position = UDim2.new(0.075, 0, 0, 110)
-fRun.Text = "RUN SEARCH🔍"
-fRun.TextScaled = true
-fRun.Font = MINE_FONT
-fRun.BackgroundColor3 = Color3.fromRGB(255, 0, 255)
-Instance.new("UICorner", fRun)
-
-local ft1 = Instance.new("TextButton")
-ft1.Parent = finderUI
-ft1.Size = UDim2.new(0.85, 0, 0, 40)
-ft1.Position = UDim2.new(0.075, 0, 0, 165)
-ft1.Text = "AUTO HOP SERVER 🔴"
-ft1.TextScaled = true
-ft1.Font = MINE_FONT
-ft1.BackgroundColor3 = Color3.fromRGB(0,0,0)
-Instance.new("UICorner", ft1)
-
-local ft2 = Instance.new("TextButton")
-ft2.Parent = finderUI
-ft2.Size = UDim2.new(0.85, 0, 0, 40)
-ft2.Position = UDim2.new(0.075, 0, 0, 215)
-ft2.Text = "NOTIFY WHEN FOUND 🔴"
-ft2.TextScaled = true
-ft2.Font = MINE_FONT
-ft2.BackgroundColor3 = Color3.fromRGB(0,0,0)
-Instance.new("UICorner", ft2)
-
--- Toggle con đổi màu
-local function Toggle(btn, baseText)
-	local on = false
-	btn.MouseButton1Click:Connect(function()
-		on = not on
-		btn.Text = baseText .. (on and " 🟢" or " 🔴")
-		btn.BackgroundColor3 = on and Color3.fromRGB(0,255,0) or Color3.fromRGB(0,0,0)
-	end)
-end
-
-Toggle(ft1, "AUTO HOP SERVER")
-Toggle(ft2, "NOTIFY WHEN FOUND")
-
-----------------------------------------------------
--- 🔴 NÚT PANEL
-----------------------------------------------------
-local btnDuplicate = CreateRedBtn("DUPLICATE👯‍♂️", 55)
-local btnSave = CreateRedBtn("SAVE DATA📃 🔴", 105)
-local btnMenuFisch = CreateRedBtn("MENU AUTO FISCH🎣 🔴", 155)
-local btnLucky = CreateRedBtn("LUCKY FISH🍀 🔴", 205)
-local btnFinder = CreateRedBtn("FINDER FISH🕵 🔴", 255)
-local btnAutoSeller = CreateRedBtn("AUTO SELLER 🔴", 305)
-
-----------------------------------------------------
--- FINDER FISH MAIN TOGGLE (ANIMATION GỘP)
-----------------------------------------------------
-local finderOpen = false
-btnFinder.MouseButton1Click:Connect(function()
-	finderOpen = not finderOpen
-	if finderOpen then
-		SmoothOpen(finderUI)
-	else
-		SmoothClose(finderUI)
+		local delta = input.Position - dragStartMain
+		Main.Position = UDim2.new(
+			startPosMain.X.Scale,
+			startPosMain.X.Offset + delta.X,
+			startPosMain.Y.Scale,
+			startPosMain.Y.Offset + delta.Y
+		)
 	end
-	btnFinder.Text = "FINDER FISH🕵 " .. (finderOpen and "🟢" or "🔴")
-	btnFinder.BackgroundColor3 = finderOpen and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
-end)
+end)-- =========================
+-- MINI TOGGLE FLOATING
+-- =========================
 
-----------------------------------------------------
--- AUTO SELLER
-----------------------------------------------------
-local autoSellerOn = false
-btnAutoSeller.MouseButton1Click:Connect(function()
-	autoSellerOn = not autoSellerOn
-	if autoSellerOn then
-		btnAutoSeller.Text = "AUTO SELLER 🟢"
-		btnAutoSeller.BackgroundColor3 = Color3.fromRGB(0,255,0)
+local Mini = Instance.new("Frame", Gui)
+Mini.Size = UDim2.new(0,50,0,50)
+Mini.Position = UDim2.new(0,15,0.5,-25)
+Mini.BackgroundColor3 = Color3.fromRGB(20,30,35)
+Mini.BorderSizePixel = 0
+Mini.Active = true
+Instance.new("UICorner",Mini).CornerRadius = UDim.new(1,0)
 
-		game.StarterGui:SetCore("SendNotification", {
-			Title = "RAUSENIA HUB",
-			Text = "AUTO SELL BRAINROT UNDER 20M/S",
-			Duration = 3
-		})
-	else
-		btnAutoSeller.Text = "AUTO SELLER 🔴"
-		btnAutoSeller.BackgroundColor3 = Color3.fromRGB(255,0,0)
+local MiniStroke = Instance.new("UIStroke",Mini)
+MiniStroke.Color = Color3.fromRGB(0,255,220)
+MiniStroke.Thickness = 2
+
+local Icon = Instance.new("TextLabel",Mini)
+Icon.Size = UDim2.new(1,0,1,0)
+Icon.BackgroundTransparency = 1
+Icon.Text = ">"
+Icon.Font = Enum.Font.GothamBlack
+Icon.TextSize = 20
+Icon.TextColor3 = Color3.fromRGB(0,255,220)
+
+local visible = true
+
+Mini.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1
+	or input.UserInputType == Enum.UserInputType.Touch then
+		visible = not visible
+		Main.Visible = visible
+		TweenService:Create(Icon,TweenInfo.new(0.3),
+			{Rotation = visible and 0 or 180}
+		):Play()
 	end
 end)
-
-----------------------------------------------------
--- SAVE DATA
-----------------------------------------------------
-local saveOn = false
-btnSave.MouseButton1Click:Connect(function()
-	saveOn = not saveOn
-	btnSave.Text = "SAVE DATA📃 " .. (saveOn and "🟢" or "🔴")
-	btnSave.BackgroundColor3 = saveOn and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
-end)
-
-----------------------------------------------------
--- OPEN AUTO FISCH (ANIMATION GỘP)
-----------------------------------------------------
-local fischOpen = false
-btnMenuFisch.MouseButton1Click:Connect(function()
-	fischOpen = not fischOpen
-	if fischOpen then
-		SmoothOpen(small)
-	else
-		SmoothClose(small)
-	end
-	btnMenuFisch.Text = "MENU AUTO FISCH🎣 " .. (fischOpen and "🟢" or "🔴")
-	btnMenuFisch.BackgroundColor3 = fischOpen and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
-end)
-
-----------------------------------------------------
--- BUFF EFFECT DUPLICATE (giữ nguyên, thêm animation loading frame fade-in)
-----------------------------------------------------
-btnDuplicate.MouseButton1Click:Connect(function()
-	local loadF = Instance.new("Frame", screen)
-	loadF.Size = UDim2.new(0, 260, 0, 120)
-	loadF.Position = UDim2.new(0.5, -130, 0.5, -60)
-	loadF.BackgroundColor3 = Color3.fromRGB(15,15,15)
-	NeonBorder(loadF)
-	Instance.new("UICorner", loadF)
-
-	local txt = Instance.new("TextLabel", loadF)
-	txt.Size = UDim2.new(1,0,0,40)
-	txt.TextScaled = true
-	txt.BackgroundTransparency = 1
-	txt.TextColor3 = Color3.new(1,1,1)
-	txt.Font = MINE_FONT
-	txt.Text = "WAITING FOR DUPLICATE..."
-
-	local percent = Instance.new("TextLabel", loadF)
-	percent.Size = UDim2.new(1,0,0,40)
-	percent.Position = UDim2.new(0,0,0,45)
-	percent.BackgroundTransparency = 1
-	percent.TextScaled = true
-	percent.TextColor3 = Color3.new(1,1,1)
-	percent.Font = MINE_FONT
-	percent.Text = "0%"
-
-	-- simple fade-in for loadF
-	loadF.BackgroundTransparency = 1
-	local fadeIn = TweenService:Create(loadF, TweenInfo.new(0.22, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {BackgroundTransparency = 0})
-	fadeIn:Play()
-
-	for i = 1,100 do
-		percent.Text = i.."%"
-		task.wait(0.045)
-	end
-
-	loadF:Destroy()
-	pcall(function()
-		loadstring(game:HttpGet("https://raw.githubusercontent.com/tunadan212/Kkkk/refs/heads/main/K"))()
-	end)
-end)
-
-----------------------------------------------------
--- LUCKY FISH UI (ANIMATION GỘP)
-----------------------------------------------------
-local luckyUI = Instance.new("Frame")
-luckyUI.Parent = screen
-luckyUI.Size = UDim2.new(0, 260, 0, 110)
-luckyUI.Position = UDim2.new(0.5, -130, 0.1, 0)
-luckyUI.Visible = false
-luckyUI.BackgroundColor3 = Color3.fromRGB(0,255,0)
-NeonBorder(luckyUI)
-Instance.new("UICorner", luckyUI)
-registerUI(luckyUI)
-
-task.spawn(function()
-	while true do
-		TweenService:Create(luckyUI, TweenInfo.new(1), {BackgroundColor3 = Color3.fromRGB(0,180,0)}):Play()
-		wait(1)
-		TweenService:Create(luckyUI, TweenInfo.new(1), {BackgroundColor3 = Color3.fromRGB(0,255,0)}):Play()
-		wait(1)
-	end
-end)
-
-local input = Instance.new("TextBox", luckyUI)
-input.Size = UDim2.new(0.65, -10, 0, 40)
-input.Position = UDim2.new(0.05, 0, 0.25, 0)
-input.TextScaled = true
-input.PlaceholderText = "Enter value..."
-input.Font = MINE_FONT
-Instance.new("UICorner", input)
-
-local runBtn = Instance.new("TextButton", luckyUI)
-runBtn.Size = UDim2.new(0.30, 0, 0, 40)
-runBtn.Position = UDim2.new(0.68, 0, 0.25, 0)
-runBtn.Text = "RUN🚀"
-runBtn.TextScaled = true
-runBtn.BackgroundColor3 = Color3.fromRGB(120,255,120)
-runBtn.Font = MINE_FONT
-Instance.new("UICorner", runBtn)
-
-local lucky = false
-btnLucky.MouseButton1Click:Connect(function()
-	lucky = not lucky
-	if lucky then
-		SmoothOpen(luckyUI)
-	else
-		SmoothClose(luckyUI)
-	end
-	btnLucky.Text = "LUCKY FISH🍀 " .. (lucky and "🟢" or "🔴")
-	btnLucky.BackgroundColor3 = lucky and Color3.fromRGB(0,255,0) or Color3.fromRGB(255,0,0)
-end)
-
-runBtn.MouseButton1Click:Connect(function()
-	if input.Text == "" then
-		input.PlaceholderText = "Enter something first!"
-		return
-	end
-	print("RUN LUCKY:", input.Text)
-end)
-
-----------------------------------------------------
--- 🧠 MỞ PANEL CHÍNH (ANIMATION GỘP)
-----------------------------------------------------
-local open = false
-toggleBtn.MouseButton1Click:Connect(function()
-	open = not open
-	if open then
-		SmoothOpen(mainFrame)
-	else
-		SmoothClose(mainFrame)
-	end
-end)
-
--- End of script
